@@ -90,5 +90,3 @@ def admin_productos():
 def admin_sucursales():
     return render_template('pages/admin/sucursales/sucursales.html')
 
-if __name__ == '__main__':
-    app.run(debug=True)
