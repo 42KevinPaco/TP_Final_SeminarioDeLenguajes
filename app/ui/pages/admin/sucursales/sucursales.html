@@ -1,0 +1,76 @@
+{% extends "components/base/layout.html" %}
+
+{% block title %}Administración - Sucursales{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin-tablas.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="page-title">Administración de Sucursales y Stock</h1>
+    
+    <section class="admin-section">
+        <div class="admin-header">
+            <h2>Sucursales</h2>
+            <button class="btn btn-primary">Agregar Sucursal</button>
+        </div>
+        
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>idSucursal</th>
+                    <th>nombre</th>
+                    <th>direccion</th>
+                    <th>latitud</th>
+                    <th>longitud</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Sucursal Centro</td>
+                    <td>Av. Principal 123</td>
+                    <td>-34.6037</td>
+                    <td>-58.3816</td>
+                    <td>
+                        <button class="btn btn-small btn-secondary">Modificar</button>
+                        <button class="btn btn-small btn-danger">Eliminar</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+    
+    <section class="admin-section">
+        <div class="admin-header">
+            <h2>Stock por Sucursal (StockSucursal)</h2>
+            <button class="btn btn-primary">Asignar Stock</button>
+        </div>
+        
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>idStock</th>
+                    <th>Producto</th>
+                    <th>Sucursal</th>
+                    <th>cantidadDisponible</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Leche Entera</td>
+                    <td>Sucursal Centro</td>
+                    <td>50</td>
+                    <td>
+                        <button class="btn btn-small btn-secondary">Actualizar Stock</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+</div>
+{% endblock %}

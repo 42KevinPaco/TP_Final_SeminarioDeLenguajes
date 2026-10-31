@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}E-commerce Supermercado{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/forms.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/catalogo.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-tablas.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mapa.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% include 'components/header/header.html' %}
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+    {% include 'components/footer/footer.html' %}
+    
+    <script src="{{ url_for('static', filename='js/guards-ui.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/validators.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/data-hardcode.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/carrito-ui.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/pago-ui.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/mapa-ui.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

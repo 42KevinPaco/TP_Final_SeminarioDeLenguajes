@@ -1,0 +1,28 @@
+{% extends "components/base/layout.html" %}
+
+{% block title %}Catálogo - Supermercado E-commerce{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/catalogo.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="catalogo-container">
+    <h1 class="page-title">Catálogo de Productos</h1>
+    
+    {% include 'components/banner-propaganda/banner-propaganda.html' %}
+    
+    <section class="productos-section">
+        <h2 class="section-title">Productos Disponibles</h2>
+        <div class="productos-grid">
+            {% for producto in productos %}
+                {% include 'components/product-card/product-card.html' %}
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/carrito-ui.js') }}"></script>
+{% endblock %}

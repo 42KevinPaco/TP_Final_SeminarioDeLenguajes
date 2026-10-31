@@ -1,0 +1,56 @@
+{% extends "components/base/layout.html" %}
+
+{% block title %}Mi Carrito - Supermercado E-commerce{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/forms.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="page-title">Carrito de Compras</h1>
+    
+    <div class="carrito-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Precio Unitario</th>
+                    <th>Cantidad</th>
+                    <th>Subtotal</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Leche Entera</td>
+                    <td>$150.00</td>
+                    <td>
+                        <input type="number" value="2" min="1" class="input-cantidad">
+                    </td>
+                    <td>$300.00</td>
+                    <td>
+                        <button class="btn btn-danger btn-small">Eliminar</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Pan Lactal</td>
+                    <td>$200.00</td>
+                    <td>
+                        <input type="number" value="1" min="1" class="input-cantidad">
+                    </td>
+                    <td>$200.00</td>
+                    <td>
+                        <button class="btn btn-danger btn-small">Eliminar</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="carrito-total">
+            <h3>Total: $500.00</h3>
+            <a href="{{ url_for('cliente_compra') }}" class="btn btn-primary">Comprar</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

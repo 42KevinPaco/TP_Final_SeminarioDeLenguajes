@@ -1,0 +1,54 @@
+{% extends "components/base/layout.html" %}
+
+{% block title %}Administración - Productos{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin-tablas.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="page-title">Administración de Productos</h1>
+    
+    <div class="admin-header">
+        <button class="btn btn-primary">Agregar Producto</button>
+    </div>
+    
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>idProducto</th>
+                <th>nombre</th>
+                <th>descripcion</th>
+                <th>precio</th>
+                <th>marca</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>Leche Entera</td>
+                <td>Leche entera pasteurizada 1L</td>
+                <td>$150.00</td>
+                <td>La Serenísima</td>
+                <td>
+                    <button class="btn btn-small btn-secondary">Modificar</button>
+                    <button class="btn btn-small btn-danger">Eliminar</button>
+                </td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Pan Lactal</td>
+                <td>Pan lactal blanco 500g</td>
+                <td>$200.00</td>
+                <td>Bimbo</td>
+                <td>
+                    <button class="btn btn-small btn-secondary">Modificar</button>
+                    <button class="btn btn-small btn-danger">Eliminar</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}

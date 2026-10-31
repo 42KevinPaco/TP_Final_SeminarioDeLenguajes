@@ -1,0 +1,64 @@
+/* Mapa */
+.mapa-layout {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.sucursales-lista h2,
+.mapa-container h2 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.sucursal-item {
+    background-color: white;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.sucursal-cercana {
+    border-color: #28a745;
+    background-color: #f8fff9;
+}
+
+.sucursal-item h3 {
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.sucursal-item p {
+    color: #666;
+    margin-bottom: 5px;
+    font-size: 0.9em;
+}
+
+.badge-cercana {
+    display: inline-block;
+    background-color: #28a745;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    margin-top: 5px;
+}
+
+.mapa-container iframe {
+    width: 100%;
+    border-radius: 4px;
+}
+
+.mapa-nota {
+    color: #666;
+    font-size: 0.9em;
+    margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+    .mapa-layout {
+        grid-template-columns: 1fr;
+    }
+}

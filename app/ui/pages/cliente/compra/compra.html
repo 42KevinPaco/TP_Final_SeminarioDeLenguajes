@@ -1,0 +1,104 @@
+{% extends "components/base/layout.html" %}
+
+{% block title %}Confirmar Compra - Supermercado E-commerce{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/forms.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="page-title">Confirmar Compra</h1>
+    
+    <div class="compra-layout">
+        <section class="compra-resumen">
+            <h2>Resumen de Compra</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unitario</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Leche Entera</td>
+                        <td>2</td>
+                        <td>$150.00</td>
+                        <td>$300.00</td>
+                    </tr>
+                    <tr>
+                        <td>Pan Lactal</td>
+                        <td>1</td>
+                        <td>$200.00</td>
+                        <td>$200.00</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="compra-total">
+                <strong>Total: $500.00</strong>
+            </div>
+        </section>
+        
+        <section class="compra-pago">
+            <h2>Datos de Compra</h2>
+            
+            <div class="form-group">
+                <label for="sucursal" class="form-label">Seleccionar Sucursal *</label>
+                <select id="sucursal" class="form-select" required>
+                    <option value="">Seleccione una sucursal</option>
+                    <option value="1">Sucursal Centro - Av. Principal 123</option>
+                    <option value="2">Sucursal Norte - Calle Norte 456</option>
+                    <option value="3">Sucursal Sur - Av. Sur 789</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Método de Pago *</label>
+                <select id="metodoPago" class="form-select" onchange="mostrarFormularioTarjeta()" required>
+                    <option value="">Seleccione método de pago</option>
+                    <option value="efectivo">Pago en Efectivo</option>
+                    <option value="debito">Tarjeta de Débito</option>
+                    <option value="credito">Tarjeta de Crédito</option>
+                </select>
+            </div>
+            
+            <div id="form-tarjeta" class="form-tarjeta" style="display: none;">
+                <h3>Datos de Tarjeta</h3>
+                <div class="form-group">
+                    <label for="numeroTarjeta" class="form-label">Número de Tarjeta *</label>
+                    <input type="text" id="numeroTarjeta" class="form-input" pattern="[0-9]{16}" placeholder="1234567812345678" maxlength="16">
+                </div>
+                <div class="form-group">
+                    <label for="titular" class="form-label">Nombre del Titular *</label>
+                    <input type="text" id="titular" class="form-input" placeholder="Como figura en la tarjeta">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="vencimiento" class="form-label">Fecha de Vencimiento (MM/AA) *</label>
+                        <input type="text" id="vencimiento" class="form-input" pattern="(0[1-9]|1[0-2])/[0-9]{2}" placeholder="MM/AA" maxlength="5">
+                    </div>
+                    <div class="form-group">
+                        <label for="cvv" class="form-label">CVV *</label>
+                        <input type="text" id="cvv" class="form-input" pattern="[0-9]{3}" placeholder="123" maxlength="3">
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary btn-full" onclick="confirmarCompra()">Confirmar Compra</button>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/pago-ui.js') }}"></script>
+<script>
+function confirmarCompra() {
+    alert('Compra confirmada (simulado). Diseño UI únicamente.');
+    window.location.href = '{{ url_for("cliente_dashboard") }}';
+}
+</script>
+{% endblock %}

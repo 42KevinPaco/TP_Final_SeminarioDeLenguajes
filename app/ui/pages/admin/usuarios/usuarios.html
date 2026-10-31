@@ -1,0 +1,63 @@
+{% extends "components/base/layout.html" %}
+
+{% block title %}Administración - Usuarios{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin-tablas.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="page-title">Administración de Usuarios</h1>
+    
+    <div class="admin-header">
+        <button class="btn btn-primary">Agregar Usuario</button>
+    </div>
+    
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>idUsuario</th>
+                <th>nombreUsuario</th>
+                <th>nombre</th>
+                <th>apellido</th>
+                <th>email</th>
+                <th>Tipo</th>
+                <th>domicilio</th>
+                <th>telefono</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>cliente1</td>
+                <td>Juan</td>
+                <td>Pérez</td>
+                <td>juan@email.com</td>
+                <td>Cliente</td>
+                <td>Av. Siempre Viva 123</td>
+                <td>1234567890</td>
+                <td>
+                    <button class="btn btn-small btn-secondary">Modificar</button>
+                    <button class="btn btn-small btn-danger">Eliminar</button>
+                </td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>admin1</td>
+                <td>María</td>
+                <td>González</td>
+                <td>maria@email.com</td>
+                <td>Administrador</td>
+                <td>-</td>
+                <td>-</td>
+                <td>
+                    <button class="btn btn-small btn-secondary">Modificar</button>
+                    <button class="btn btn-small btn-danger">Eliminar</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}
