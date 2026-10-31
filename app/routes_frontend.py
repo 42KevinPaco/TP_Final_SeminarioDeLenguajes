@@ -56,38 +56,38 @@ def registro():
 
 # Cliente - Requiere login
 @app.route('/cliente/dashboard')
-@requerir_login
+
 def cliente_dashboard():
     return render_template('pages/cliente/dashboard/dashboard.html')
 
 @app.route('/cliente/carrito')
-@requerir_login
+
 def cliente_carrito():
     return render_template('pages/cliente/carrito/carrito.html')
 
 @app.route('/cliente/compra')
-@requerir_login
+
 def cliente_compra():
     return render_template('pages/cliente/compra/compra.html')
 
 @app.route('/cliente/sucursales-cercanas')
-@requerir_login
+
 def cliente_sucursales_cercanas():
     return render_template('pages/cliente/sucursales-cercanas/sucursales-cercanas.html')
 
 # Admin - Requiere login y rol admin
 @app.route('/admin/usuarios')
-@requerir_admin
+
 def admin_usuarios():
     return render_template('pages/admin/usuarios/usuarios.html')
 
 @app.route('/admin/productos')
-@requerir_admin
+
 def admin_productos():
     return render_template('pages/admin/productos/productos.html')
 
 @app.route('/admin/sucursales')
-@requerir_admin
+
 def admin_sucursales():
     return render_template('pages/admin/sucursales/sucursales.html')
 
