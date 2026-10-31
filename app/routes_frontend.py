@@ -1,9 +1,10 @@
 from flask import Flask, render_template, session, redirect, url_for, request
 from functools import wraps
 
+import os
 app = Flask(__name__, 
-            template_folder='app/ui', 
-            static_folder='app/static')
+            template_folder=os.path.join(os.path.dirname(__file__), 'ui'), 
+            static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 app.secret_key = 'clave-simulada-solo-diseño'
 
 def requerir_login(f):
