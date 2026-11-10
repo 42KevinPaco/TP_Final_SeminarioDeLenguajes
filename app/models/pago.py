@@ -41,6 +41,11 @@ class Pago(ABC):
     def procesar_pago(self) -> ResultadoPago:
         """Apply the method-specific payment rules."""
 
+    @property
+    @abstractmethod
+    def metodo(self) -> str:
+        """Stable discriminator persisted with the purchase (never card data)."""
+
 
 @dataclass
 class PagoEfectivo(Pago):
@@ -57,6 +62,10 @@ class PagoEfectivo(Pago):
             return ResultadoPago(False, "El monto recibido no alcanza para cubrir el total")
         self.estado = ESTADO_APROBADO
         return ResultadoPago(True, "Pago en efectivo registrado", round(self.monto_recibido - self.importe, 2))
+
+    @property
+    def metodo(self) -> str:
+        return "efectivo"
 
 
 @dataclass
@@ -106,6 +115,10 @@ class PagoDebito(_PagoConTarjeta):
     def procesar_pago(self) -> ResultadoPago:
         return self._procesar_tarjeta("Pago con tarjeta de débito aprobado")
 
+    @property
+    def metodo(self) -> str:
+        return "debito"
+
 
 @dataclass
 class PagoCredito(_PagoConTarjeta):
@@ -118,3 +131,7 @@ class PagoCredito(_PagoConTarjeta):
 
     def procesar_pago(self) -> ResultadoPago:
         return self._procesar_tarjeta(f"Pago con tarjeta de crédito aprobado en {self.cuotas} cuota(s)")
+
+    @property
+    def metodo(self) -> str:
+        return "credito"
