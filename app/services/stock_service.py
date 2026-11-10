@@ -62,3 +62,15 @@ class StockService:
     def hay_disponibilidad(self, id_producto: int, id_sucursal: int, cantidad: int = 1) -> bool:
         stock = self._stock.obtener(id_producto, id_sucursal)
         return stock is not None and stock.verificar_cantidad(cantidad)
+
+    def cantidad_total(self, id_producto: int) -> int:
+        """Available units across every branch (catalog-level availability)."""
+        return sum(
+            stock.cantidad_disponible for stock in self._stock.listar_por_producto(id_producto)
+        )
+
+    def cantidad_total_por_producto(self) -> dict[int, int]:
+        totales: dict[int, int] = {}
+        for stock in self._stock.listar():
+            totales[stock.id_producto] = totales.get(stock.id_producto, 0) + stock.cantidad_disponible
+        return totales
