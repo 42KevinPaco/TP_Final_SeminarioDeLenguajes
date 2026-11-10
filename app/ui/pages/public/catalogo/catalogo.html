@@ -8,15 +8,24 @@
 
 {% block content %}
 <div class="catalogo-container">
-    <h1 class="page-title">Catálogo de Productos</h1>
-    
+    {% set destino_carrito = url_for('cliente_carrito') if session.get('rol') == 'cliente' else url_for('login', next=url_for('cliente_carrito')) %}
+    <div class="catalogo-encabezado">
+        <h1 class="page-title">Catálogo de Productos</h1>
+        <a href="{{ destino_carrito }}" class="carrito-flotante" aria-label="Ver carrito">
+            <span class="carrito-flotante-icono" aria-hidden="true">&#128722;</span>
+            <span class="carrito-contador js-carrito-contador" data-cantidad="{{ cantidad_carrito }}">{{ cantidad_carrito }}</span>
+        </a>
+    </div>
+
     {% include 'components/banner-propaganda/banner-propaganda.html' %}
-    
+
     <section class="productos-section">
         <h2 class="section-title">Productos Disponibles</h2>
         <div class="productos-grid">
             {% for producto in productos %}
                 {% include 'components/product-card/product-card.html' %}
+            {% else %}
+                <p class="catalogo-vacio">No hay productos disponibles por el momento.</p>
             {% endfor %}
         </div>
     </section>

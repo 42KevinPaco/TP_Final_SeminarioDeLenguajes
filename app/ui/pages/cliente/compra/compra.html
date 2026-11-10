@@ -45,13 +45,16 @@
         <section class="compra-pago">
             <h2>Datos de Compra</h2>
 
-            <form id="formCompra" novalidate>
+            <form id="formCompra" method="post" action="{{ url_for('cliente_compra') }}" novalidate>
                 <div class="form-group">
                     <label for="sucursal" class="form-label">Seleccionar Sucursal *</label>
                     <select id="sucursal" name="sucursal" class="form-select">
                         <option value="">Seleccione una sucursal</option>
                         {% for sucursal in sucursales %}
-                            <option value="{{ sucursal.id_sucursal }}">{{ sucursal.nombre }} - {{ sucursal.direccion }}</option>
+                            <option value="{{ sucursal.id_sucursal }}"
+                                {% if form_data.get('sucursal') == sucursal.id_sucursal|string %}selected{% endif %}>
+                                {{ sucursal.nombre }} - {{ sucursal.direccion }}
+                            </option>
                         {% endfor %}
                     </select>
                     <span class="error-message" id="error-sucursal"></span>
@@ -61,11 +64,28 @@
                     <label for="metodoPago" class="form-label">Método de Pago *</label>
                     <select id="metodoPago" name="metodoPago" class="form-select" onchange="mostrarFormularioTarjeta()">
                         <option value="">Seleccione método de pago</option>
-                        <option value="efectivo">Pago en Efectivo (PagoEfectivo)</option>
-                        <option value="debito">Tarjeta de Débito (PagoDebito)</option>
-                        <option value="credito">Tarjeta de Crédito (PagoCredito)</option>
+                        <option value="efectivo" {% if form_data.get('metodoPago') == 'efectivo' %}selected{% endif %}>
+                            Pago en Efectivo (PagoEfectivo)
+                        </option>
+                        <option value="debito" {% if form_data.get('metodoPago') == 'debito' %}selected{% endif %}>
+                            Tarjeta de Débito (PagoDebito)
+                        </option>
+                        <option value="credito" {% if form_data.get('metodoPago') == 'credito' %}selected{% endif %}>
+                            Tarjeta de Crédito (PagoCredito)
+                        </option>
                     </select>
                     <span class="error-message" id="error-metodoPago"></span>
+                </div>
+
+                <div id="form-efectivo" class="form-tarjeta" style="display: none;">
+                    <h3>Pago en Efectivo</h3>
+                    <div class="form-group">
+                        <label for="monto_recibido" class="form-label">Monto recibido *</label>
+                        <input type="number" id="monto_recibido" name="monto_recibido" class="form-input"
+                               min="0" step="0.01" value="{{ form_data.get('monto_recibido', '') }}"
+                               placeholder="Cuánto entrega el cliente">
+                        <span class="error-message" id="error-monto_recibido"></span>
+                    </div>
                 </div>
 
                 <div id="form-tarjeta" class="form-tarjeta" style="display: none;">
@@ -73,28 +93,38 @@
                     <div class="form-group">
                         <label for="numeroTarjeta" class="form-label">Número de Tarjeta *</label>
                         <input type="text" id="numeroTarjeta" name="numeroTarjeta" class="form-input"
-                               inputmode="numeric" maxlength="16" placeholder="16 dígitos">
+                               inputmode="numeric" maxlength="16" placeholder="16 dígitos"
+                               value="{{ form_data.get('numeroTarjeta', '') }}">
                         <span class="error-message" id="error-numeroTarjeta"></span>
                     </div>
                     <div class="form-group">
                         <label for="titular" class="form-label">Nombre del Titular *</label>
                         <input type="text" id="titular" name="titular" class="form-input"
-                               placeholder="Como figura en la tarjeta">
+                               placeholder="Como figura en la tarjeta"
+                               value="{{ form_data.get('titular', '') }}">
                         <span class="error-message" id="error-titular"></span>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="vencimiento" class="form-label">Vencimiento (MM/AA) *</label>
                             <input type="text" id="vencimiento" name="vencimiento" class="form-input"
-                                   maxlength="5" placeholder="MM/AA">
+                                   maxlength="5" placeholder="MM/AA"
+                                   value="{{ form_data.get('vencimiento', '') }}">
                             <span class="error-message" id="error-vencimiento"></span>
                         </div>
                         <div class="form-group">
                             <label for="cvv" class="form-label">CVV *</label>
                             <input type="text" id="cvv" name="cvv" class="form-input"
-                                   inputmode="numeric" maxlength="3" placeholder="123">
+                                   inputmode="numeric" maxlength="3" placeholder="123"
+                                   value="{{ form_data.get('cvv', '') }}">
                             <span class="error-message" id="error-cvv"></span>
                         </div>
+                    </div>
+                    <div class="form-group" id="form-cuotas" style="display: none;">
+                        <label for="cuotas" class="form-label">Cuotas *</label>
+                        <input type="number" id="cuotas" name="cuotas" class="form-input"
+                               min="1" step="1" value="{{ form_data.get('cuotas', 1) }}">
+                        <span class="error-message" id="error-cuotas"></span>
                     </div>
                 </div>
 
@@ -107,13 +137,5 @@
 
 {% block extra_js %}
 <script src="{{ url_for('static', filename='js/pago-ui.js') }}"></script>
-<script>
-document.getElementById('formCompra').addEventListener('submit', function (e) {
-    e.preventDefault();
-    if (!validarCompra()) return;
-    // TODO: conectar con Compra.confirmar_compra() y Pago.procesar_pago() de la capa de servicios
-    alert('Compra confirmada (simulado). Falta conectar el servicio de compras.');
-    window.location.href = '{{ url_for("cliente_dashboard") }}';
-});
-</script>
+<script>mostrarFormularioTarjeta();</script>
 {% endblock %}

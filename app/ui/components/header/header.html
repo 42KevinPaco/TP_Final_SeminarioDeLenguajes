@@ -23,7 +23,9 @@
                     </li>
                 {% else %}
                     <li class="nav-item">
-                        <a href="{{ url_for('cliente_carrito') }}" class="nav-link">Carrito</a>
+                        <a href="{{ url_for('cliente_carrito') }}" class="nav-link">
+                            Carrito <span class="carrito-contador js-carrito-contador" data-cantidad="{{ cantidad_carrito }}">{{ cantidad_carrito }}</span>
+                        </a>
                     </li>
                     <li class="nav-item">
                         <a href="{{ url_for('cliente_dashboard') }}" class="nav-link">Mi Cuenta</a>

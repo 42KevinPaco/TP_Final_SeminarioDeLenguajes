@@ -21,21 +21,25 @@
                     <th>Acciones</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="carrito-items">
                 {% for item in items %}
-                    <tr data-item-carrito data-precio="{{ item.precio_unitario }}">
+                    <tr data-item-carrito data-id-producto="{{ item.producto.id_producto }}"
+                        data-precio="{{ item.precio_unitario }}">
                         <td>{{ item.producto.nombre }}</td>
                         <td>$ {{ "%.2f"|format(item.precio_unitario) }}</td>
                         <td>
-                            <input type="number" value="{{ item.cantidad }}" min="1" step="1" class="input-cantidad">
+                            <input type="number" value="{{ item.cantidad }}" min="1" step="1"
+                                   class="input-cantidad"
+                                   onchange="actualizarCantidad({{ item.producto.id_producto }}, this.value)">
                         </td>
                         <td data-subtotal>$ {{ "%.2f"|format(item.subtotal) }}</td>
                         <td>
-                            <button class="btn btn-danger btn-small">Eliminar</button>
+                            <button type="button" class="btn btn-danger btn-small"
+                                    onclick="eliminarDelCarrito({{ item.producto.id_producto }})">Eliminar</button>
                         </td>
                     </tr>
                 {% else %}
-                    <tr>
+                    <tr id="carrito-vacio">
                         <td colspan="5" class="tabla-vacia">Tu carrito está vacío.</td>
                     </tr>
                 {% endfor %}
@@ -43,8 +47,12 @@
         </table>
 
         <div class="carrito-total">
-            <h3>Total: <span id="total-carrito">$ 0.00</span></h3>
-            <a href="{{ url_for('cliente_compra') }}" class="btn btn-primary">Comprar</a>
+            <h3>Total: <span id="total-carrito">$ {{ "%.2f"|format(carrito.calcular_total()) }}</span></h3>
+            {% if items %}
+                <a href="{{ url_for('cliente_compra') }}" class="btn btn-primary">Comprar</a>
+            {% else %}
+                <a href="{{ url_for('catalogo') }}" class="btn btn-secondary">Ver catálogo</a>
+            {% endif %}
         </div>
     </div>
 </div>
