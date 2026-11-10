@@ -7,11 +7,13 @@ Guards rely on the server-side session, never on client-side state.
 import os
 from functools import wraps
 
-from flask import Flask, flash, redirect, render_template, request, session, url_for
+from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
 
 from app.container import build_container
+from app.models.pago import PagoCredito, PagoDebito, PagoEfectivo
+from app.utils import validators
 from app.utils.config import SECRET_KEY
-from app.utils.exceptions import ErrorDeNegocio
+from app.utils.exceptions import DatosInvalidosError, ErrorDeNegocio
 
 app = Flask(
     __name__,
@@ -55,6 +57,29 @@ def requerir_cliente(f):
     return decorated_function
 
 
+def requerir_cliente_api(f):
+    """JSON variant of the customer guard: fetch() callers never get a redirect."""
+
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('id_usuario'):
+            return jsonify({'ok': False, 'mensaje': 'Necesitás iniciar sesión para continuar'}), 401
+        if session.get('rol') != ROL_CLIENTE:
+            return jsonify({'ok': False, 'mensaje': 'El administrador no tiene carrito'}), 403
+        return f(*args, **kwargs)
+
+    return decorated_function
+
+
+@app.context_processor
+def inyectar_cantidad_carrito():
+    """Expose the cart counter to every template (badge in header and catalog)."""
+    cantidad = 0
+    if session.get('id_usuario') and session.get('rol') == ROL_CLIENTE:
+        cantidad = container.carrito_service.contar_unidades(session['id_usuario'])
+    return {'cantidad_carrito': cantidad}
+
+
 def _destino_por_rol() -> str:
     if session.get('rol') == ROL_ADMINISTRADOR:
         return url_for('admin_usuarios')
@@ -72,13 +97,13 @@ def _destino_seguro(valor: str | None) -> str | None:
 @app.route('/')
 @app.route('/catalogo')
 def catalogo():
-    productos = container.producto_service.listar()
+    productos = container.catalogo_service.listar_disponibles()
     return render_template('pages/public/catalogo/catalogo.html', productos=productos)
 
 
 @app.route('/productos')
 def productos_publico():
-    productos = container.producto_service.listar()
+    productos = container.catalogo_service.listar_disponibles()
     return render_template('pages/public/catalogo/catalogo.html', productos=productos)
 
 
@@ -157,21 +182,145 @@ def cliente_dashboard():
 @app.route('/cliente/carrito')
 @requerir_cliente
 def cliente_carrito():
-    # Cart persistence belongs to the pending cart service; the page renders
-    # an empty state until then.
-    return render_template('pages/cliente/carrito/carrito.html', items=[])
+    carrito = container.carrito_service.obtener_carrito(session['id_usuario'])
+    return render_template('pages/cliente/carrito/carrito.html', carrito=carrito, items=carrito.items)
 
 
-@app.route('/cliente/compra')
+def _carrito_json(carrito) -> dict:
+    return {
+        'ok': True,
+        'cantidad_total': carrito.cantidad_items,
+        'total': carrito.calcular_total(),
+        'items': [
+            {
+                'id_producto': item.producto.id_producto,
+                'nombre': item.producto.nombre,
+                'cantidad': item.cantidad,
+                'precio_unitario': item.precio_unitario,
+                'subtotal': item.subtotal,
+            }
+            for item in carrito.items
+        ],
+    }
+
+
+def _datos_carrito():
+    return request.get_json(silent=True) or request.form
+
+
+@app.route('/carrito/agregar', methods=['POST'])
+@requerir_cliente_api
+def carrito_agregar():
+    datos = _datos_carrito()
+    try:
+        id_producto = validators.validar_entero_positivo(datos.get('id_producto'), 'producto')
+        carrito = container.carrito_service.agregar(
+            session['id_usuario'],
+            id_producto,
+            datos.get('cantidad', 1),
+        )
+    except (ErrorDeNegocio, ValueError) as error:
+        return jsonify({'ok': False, 'mensaje': str(error)}), 400
+    return jsonify(_carrito_json(carrito))
+
+
+@app.route('/carrito/actualizar', methods=['POST'])
+@requerir_cliente_api
+def carrito_actualizar():
+    datos = _datos_carrito()
+    try:
+        id_producto = validators.validar_entero_positivo(datos.get('id_producto'), 'producto')
+        carrito = container.carrito_service.actualizar_cantidad(
+            session['id_usuario'],
+            id_producto,
+            datos.get('cantidad'),
+        )
+    except (ErrorDeNegocio, ValueError) as error:
+        return jsonify({'ok': False, 'mensaje': str(error)}), 400
+    return jsonify(_carrito_json(carrito))
+
+
+@app.route('/carrito/eliminar', methods=['POST'])
+@requerir_cliente_api
+def carrito_eliminar():
+    datos = _datos_carrito()
+    try:
+        id_producto = validators.validar_entero_positivo(datos.get('id_producto'), 'producto')
+        carrito = container.carrito_service.eliminar(session['id_usuario'], id_producto)
+    except (ErrorDeNegocio, ValueError) as error:
+        return jsonify({'ok': False, 'mensaje': str(error)}), 400
+    return jsonify(_carrito_json(carrito))
+
+
+def _construir_pago(formulario, importe: float):
+    """Build the polymorphic payment object the purchase service expects."""
+    metodo = (formulario.get('metodoPago') or '').strip()
+    if metodo == 'efectivo':
+        return PagoEfectivo(
+            id_pago=0,
+            importe=importe,
+            monto_recibido=validators.validar_numero_positivo(
+                formulario.get('monto_recibido'), 'monto recibido'
+            ),
+        )
+    if metodo in ('debito', 'credito'):
+        datos_tarjeta = {
+            'id_pago': 0,
+            'importe': importe,
+            'numero_tarjeta': formulario.get('numeroTarjeta', ''),
+            'titular': formulario.get('titular', ''),
+            'vencimiento': formulario.get('vencimiento', ''),
+            'cvv': formulario.get('cvv', ''),
+        }
+        if metodo == 'debito':
+            return PagoDebito(**datos_tarjeta)
+        return PagoCredito(
+            cuotas=validators.validar_entero_positivo(formulario.get('cuotas', 1), 'cuotas'),
+            **datos_tarjeta,
+        )
+    raise DatosInvalidosError('Elegí un método de pago')
+
+
+def _render_compra(sucursales, status: int = 200):
+    borrador = container.compra_service.preparar(session['id_usuario'])
+    detalles = borrador.detalles if borrador is not None else []
+    total = borrador.total if borrador is not None else 0.0
+    return (
+        render_template(
+            'pages/cliente/compra/compra.html',
+            sucursales=sucursales,
+            detalles=detalles,
+            total=total,
+            form_data=request.form,
+        ),
+        status,
+    )
+
+
+@app.route('/cliente/compra', methods=['GET', 'POST'])
 @requerir_cliente
 def cliente_compra():
     sucursales = container.sucursal_service.listar()
-    return render_template(
-        'pages/cliente/compra/compra.html',
-        sucursales=sucursales,
-        detalles=[],
-        total=0.0,
-    )
+
+    if request.method == 'POST':
+        try:
+            borrador = container.compra_service.preparar(session['id_usuario'])
+            if borrador is None:
+                raise DatosInvalidosError('Tu carrito está vacío')
+            id_sucursal = validators.validar_entero_positivo(request.form.get('sucursal'), 'sucursal')
+            pago = _construir_pago(request.form, borrador.total)
+            compra = container.compra_service.confirmar(session['id_usuario'], id_sucursal, pago)
+        except (ErrorDeNegocio, ValueError) as error:
+            flash(str(error), 'error')
+            return _render_compra(sucursales, status=400)
+
+        flash(f'Compra #{compra.id_compra} confirmada. Total: $ {compra.total:.2f}', 'success')
+        return redirect(url_for('cliente_dashboard'))
+
+    if container.compra_service.preparar(session['id_usuario']) is None:
+        flash('Tu carrito está vacío', 'info')
+        return redirect(url_for('cliente_carrito'))
+    return _render_compra(sucursales)
 
 
 @app.route('/cliente/sucursales-cercanas')
