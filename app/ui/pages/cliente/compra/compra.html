@@ -13,7 +13,6 @@
     <div class="compra-layout">
         <section class="compra-resumen">
             <h2>Resumen de Compra</h2>
-            {# Datos harcodeados: reemplazar por Compra.detalles (DetalleCompra) desde la capa de servicios #}
             <table class="table">
                 <thead>
                     <tr>
@@ -24,22 +23,22 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Leche Entera</td>
-                        <td>2</td>
-                        <td>$ 150.00</td>
-                        <td>$ 300.00</td>
-                    </tr>
-                    <tr>
-                        <td>Pan Lactal</td>
-                        <td>1</td>
-                        <td>$ 200.00</td>
-                        <td>$ 200.00</td>
-                    </tr>
+                    {% for detalle in detalles %}
+                        <tr>
+                            <td>{{ detalle.nombre_producto }}</td>
+                            <td>{{ detalle.cantidad }}</td>
+                            <td>$ {{ "%.2f"|format(detalle.precio_unitario) }}</td>
+                            <td>$ {{ "%.2f"|format(detalle.subtotal) }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="tabla-vacia">Todavía no hay productos en la compra.</td>
+                        </tr>
+                    {% endfor %}
                 </tbody>
             </table>
             <div class="compra-total">
-                <strong>Total: $ 500.00</strong>
+                <strong>Total: $ {{ "%.2f"|format(total) }}</strong>
             </div>
         </section>
 
@@ -51,9 +50,9 @@
                     <label for="sucursal" class="form-label">Seleccionar Sucursal *</label>
                     <select id="sucursal" name="sucursal" class="form-select">
                         <option value="">Seleccione una sucursal</option>
-                        <option value="1">Sucursal Centro - Av. Principal 123</option>
-                        <option value="2">Sucursal Norte - Calle Norte 456</option>
-                        <option value="3">Sucursal Sur - Av. Sur 789</option>
+                        {% for sucursal in sucursales %}
+                            <option value="{{ sucursal.id_sucursal }}">{{ sucursal.nombre }} - {{ sucursal.direccion }}</option>
+                        {% endfor %}
                     </select>
                     <span class="error-message" id="error-sucursal"></span>
                 </div>
@@ -112,8 +111,8 @@
 document.getElementById('formCompra').addEventListener('submit', function (e) {
     e.preventDefault();
     if (!validarCompra()) return;
-    // TODO: conectar con Compra.confirmarCompra() y Pago.procesarPago() de la capa de servicios
-    alert('Compra confirmada (simulado). Diseño UI únicamente.');
+    // TODO: conectar con Compra.confirmar_compra() y Pago.procesar_pago() de la capa de servicios
+    alert('Compra confirmada (simulado). Falta conectar el servicio de compras.');
     window.location.href = '{{ url_for("cliente_dashboard") }}';
 });
 </script>

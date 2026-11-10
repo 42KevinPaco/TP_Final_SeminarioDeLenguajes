@@ -9,11 +9,11 @@
 {% block content %}
 <div class="container">
     <h1 class="page-title">Administración de Productos</h1>
-    
+
     <div class="admin-header">
-        <button class="btn btn-primary">Agregar Producto</button>
+        <button class="btn btn-primary" disabled>Agregar Producto</button>
     </div>
-    
+
     <table class="admin-table">
         <thead>
             <tr>
@@ -26,28 +26,23 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>1</td>
-                <td>Leche Entera</td>
-                <td>Leche entera pasteurizada 1L</td>
-                <td>$150.00</td>
-                <td>La Serenísima</td>
-                <td>
-                    <button class="btn btn-small btn-secondary">Modificar</button>
-                    <button class="btn btn-small btn-danger">Eliminar</button>
-                </td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>Pan Lactal</td>
-                <td>Pan lactal blanco 500g</td>
-                <td>$200.00</td>
-                <td>Bimbo</td>
-                <td>
-                    <button class="btn btn-small btn-secondary">Modificar</button>
-                    <button class="btn btn-small btn-danger">Eliminar</button>
-                </td>
-            </tr>
+            {% for producto in productos %}
+                <tr>
+                    <td>{{ producto.id_producto }}</td>
+                    <td>{{ producto.nombre }}</td>
+                    <td>{{ producto.descripcion }}</td>
+                    <td>$ {{ "%.2f"|format(producto.precio) }}</td>
+                    <td>{{ producto.marca }}</td>
+                    <td>
+                        <button class="btn btn-small btn-secondary" disabled>Modificar</button>
+                        <button class="btn btn-small btn-danger" disabled>Eliminar</button>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6" class="tabla-vacia">No hay productos cargados.</td>
+                </tr>
+            {% endfor %}
         </tbody>
     </table>
 </div>

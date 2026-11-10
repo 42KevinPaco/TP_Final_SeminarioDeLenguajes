@@ -9,13 +9,13 @@
 {% block content %}
 <div class="container">
     <h1 class="page-title">Administración de Sucursales y Stock</h1>
-    
+
     <section class="admin-section">
         <div class="admin-header">
             <h2>Sucursales</h2>
-            <button class="btn btn-primary">Agregar Sucursal</button>
+            <button class="btn btn-primary" disabled>Agregar Sucursal</button>
         </div>
-        
+
         <table class="admin-table">
             <thead>
                 <tr>
@@ -28,27 +28,33 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>Sucursal Centro</td>
-                    <td>Av. Principal 123</td>
-                    <td>-34.6037</td>
-                    <td>-58.3816</td>
-                    <td>
-                        <button class="btn btn-small btn-secondary">Modificar</button>
-                        <button class="btn btn-small btn-danger">Eliminar</button>
-                    </td>
-                </tr>
+                {% for sucursal in sucursales %}
+                    <tr>
+                        <td>{{ sucursal.id_sucursal }}</td>
+                        <td>{{ sucursal.nombre }}</td>
+                        <td>{{ sucursal.direccion }}</td>
+                        <td>{{ "%.4f"|format(sucursal.latitud) }}</td>
+                        <td>{{ "%.4f"|format(sucursal.longitud) }}</td>
+                        <td>
+                            <button class="btn btn-small btn-secondary" disabled>Modificar</button>
+                            <button class="btn btn-small btn-danger" disabled>Eliminar</button>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="tabla-vacia">No hay sucursales cargadas.</td>
+                    </tr>
+                {% endfor %}
             </tbody>
         </table>
     </section>
-    
+
     <section class="admin-section">
         <div class="admin-header">
             <h2>Stock por Sucursal (StockSucursal)</h2>
-            <button class="btn btn-primary">Asignar Stock</button>
+            <button class="btn btn-primary" disabled>Asignar Stock</button>
         </div>
-        
+
         <table class="admin-table">
             <thead>
                 <tr>
@@ -60,15 +66,21 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>Leche Entera</td>
-                    <td>Sucursal Centro</td>
-                    <td>50</td>
-                    <td>
-                        <button class="btn btn-small btn-secondary">Actualizar Stock</button>
-                    </td>
-                </tr>
+                {% for fila in filas_stock %}
+                    <tr>
+                        <td>{{ fila.stock.id_stock }}</td>
+                        <td>{{ fila.producto.nombre if fila.producto else 'Producto eliminado' }}</td>
+                        <td>{{ fila.sucursal.nombre if fila.sucursal else 'Sucursal eliminada' }}</td>
+                        <td>{{ fila.stock.cantidad_disponible }}</td>
+                        <td>
+                            <button class="btn btn-small btn-secondary" disabled>Actualizar Stock</button>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="tabla-vacia">No hay stock registrado.</td>
+                    </tr>
+                {% endfor %}
             </tbody>
         </table>
     </section>

@@ -7,33 +7,44 @@
             <li class="nav-item">
                 <a href="{{ url_for('catalogo') }}" class="nav-link">Catálogo</a>
             </li>
-            <li class="nav-item" data-guest-only>
-                <a href="{{ url_for('login') }}" class="nav-link">Iniciar Sesión</a>
-            </li>
-            <li class="nav-item" data-guest-only>
-                <a href="{{ url_for('registro') }}" class="nav-link">Registrarse</a>
-            </li>
-            <li class="nav-item" data-auth-only>
-                <a href="{{ url_for('cliente_carrito') }}" class="nav-link">Carrito</a>
-            </li>
-            <li class="nav-item" data-auth-only data-cliente-only>
-                <a href="{{ url_for('cliente_dashboard') }}" class="nav-link">Mi Cuenta</a>
-            </li>
-            <li class="nav-item" data-auth-only data-cliente-only>
-                <a href="{{ url_for('cliente_sucursales_cercanas') }}" class="nav-link">Sucursales Cercanas</a>
-            </li>
-            <li class="nav-item" data-auth-only data-admin-only>
-                <a href="{{ url_for('admin_usuarios') }}" class="nav-link">Admin - Usuarios</a>
-            </li>
-            <li class="nav-item" data-auth-only data-admin-only>
-                <a href="{{ url_for('admin_productos') }}" class="nav-link">Admin - Productos</a>
-            </li>
-            <li class="nav-item" data-auth-only data-admin-only>
-                <a href="{{ url_for('admin_sucursales') }}" class="nav-link">Admin - Sucursales</a>
-            </li>
-            <li class="nav-item" data-auth-only>
-                <a href="#" class="nav-link" onclick="cerrarSesionUI(); return false;">Cerrar Sesión</a>
-            </li>
+            {% if session.get('id_usuario') %}
+                <li class="nav-item">
+                    <span class="nav-link nav-user">Hola, {{ session.get('nombre_usuario') }}</span>
+                </li>
+                {% if session.get('rol') == 'administrador' %}
+                    <li class="nav-item">
+                        <a href="{{ url_for('admin_usuarios') }}" class="nav-link">Admin - Usuarios</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('admin_productos') }}" class="nav-link">Admin - Productos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('admin_sucursales') }}" class="nav-link">Admin - Sucursales</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a href="{{ url_for('cliente_carrito') }}" class="nav-link">Carrito</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('cliente_dashboard') }}" class="nav-link">Mi Cuenta</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('cliente_sucursales_cercanas') }}" class="nav-link">Sucursales Cercanas</a>
+                    </li>
+                {% endif %}
+                <li class="nav-item">
+                    <form method="post" action="{{ url_for('logout') }}" class="logout-form">
+                        <button type="submit" class="nav-link btn-link">Cerrar Sesión</button>
+                    </form>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                    <a href="{{ url_for('login') }}" class="nav-link">Iniciar Sesión</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('registro') }}" class="nav-link">Registrarse</a>
+                </li>
+            {% endif %}
         </ul>
     </nav>
 </header>

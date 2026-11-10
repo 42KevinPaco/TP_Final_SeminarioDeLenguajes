@@ -16,13 +16,21 @@
 <body>
     {% include 'components/header/header.html' %}
     <main class="main-content">
+        {% with mensajes = get_flashed_messages(with_categories=true) %}
+            {% if mensajes %}
+                <div class="flash-container">
+                    {% for categoria, mensaje in mensajes %}
+                        <div class="flash-message flash-{{ categoria }}">{{ mensaje }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
         {% block content %}{% endblock %}
     </main>
     {% include 'components/footer/footer.html' %}
-    
-    <script src="{{ url_for('static', filename='js/guards-ui.js') }}"></script>
+
+    <script>window.USUARIO_AUTENTICADO = {{ (session.get('id_usuario') is not none) | tojson }};</script>
     <script src="{{ url_for('static', filename='js/validators.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/data-hardcode.js') }}"></script>
     <script src="{{ url_for('static', filename='js/carrito-ui.js') }}"></script>
     <script src="{{ url_for('static', filename='js/pago-ui.js') }}"></script>
     <script src="{{ url_for('static', filename='js/mapa-ui.js') }}"></script>

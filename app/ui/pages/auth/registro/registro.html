@@ -10,13 +10,14 @@
 <div class="auth-container">
     <div class="auth-card auth-card-wide">
         <h1 class="auth-title">Registro de Cliente</h1>
-        <form id="formRegistro" class="auth-form" novalidate>
+        <form id="formRegistro" class="auth-form" method="post" action="{{ url_for('registro') }}" novalidate>
             <fieldset class="form-fieldset">
                 <legend>Datos de Usuario</legend>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="nombreUsuario" class="form-label">Nombre de Usuario *</label>
-                        <input type="text" id="nombreUsuario" name="nombreUsuario" class="form-input" required>
+                        <input type="text" id="nombreUsuario" name="nombre_usuario" class="form-input"
+                               value="{{ form_data.get('nombre_usuario', '') }}" required>
                         <span class="error-message" id="error-nombreUsuario"></span>
                     </div>
                     <div class="form-group">
@@ -25,45 +26,50 @@
                         <span class="error-message" id="error-contrasena"></span>
                     </div>
                 </div>
-                
+
                 <div class="form-row">
                     <div class="form-group">
                         <label for="nombre" class="form-label">Nombre *</label>
-                        <input type="text" id="nombre" name="nombre" class="form-input" required>
+                        <input type="text" id="nombre" name="nombre" class="form-input"
+                               value="{{ form_data.get('nombre', '') }}" required>
                         <span class="error-message" id="error-nombre"></span>
                     </div>
                     <div class="form-group">
                         <label for="apellido" class="form-label">Apellido *</label>
-                        <input type="text" id="apellido" name="apellido" class="form-input" required>
+                        <input type="text" id="apellido" name="apellido" class="form-input"
+                               value="{{ form_data.get('apellido', '') }}" required>
                         <span class="error-message" id="error-apellido"></span>
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="email" class="form-label">Email *</label>
-                    <input type="email" id="email" name="email" class="form-input" required>
+                    <input type="email" id="email" name="email" class="form-input"
+                           value="{{ form_data.get('email', '') }}" required>
                     <span class="error-message" id="error-email"></span>
                 </div>
             </fieldset>
-            
+
             <fieldset class="form-fieldset">
                 <legend>Datos de Cliente</legend>
                 <div class="form-group">
                     <label for="domicilio" class="form-label">Domicilio *</label>
-                    <input type="text" id="domicilio" name="domicilio" class="form-input" required>
+                    <input type="text" id="domicilio" name="domicilio" class="form-input"
+                           value="{{ form_data.get('domicilio', '') }}" required>
                     <span class="error-message" id="error-domicilio"></span>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="telefono" class="form-label">Teléfono *</label>
-                    <input type="tel" id="telefono" name="telefono" class="form-input" pattern="[0-9]{10}" required>
+                    <input type="tel" id="telefono" name="telefono" class="form-input" pattern="[0-9]{10}"
+                           value="{{ form_data.get('telefono', '') }}" required>
                     <span class="error-message" id="error-telefono"></span>
                 </div>
             </fieldset>
-            
+
             <button type="submit" class="btn btn-primary btn-full">Registrarse</button>
         </form>
-        
+
         <div class="auth-footer">
             <p>¿Ya tenés cuenta? <a href="{{ url_for('login') }}">Iniciá sesión aquí</a></p>
         </div>
@@ -73,11 +79,9 @@
 
 {% block extra_js %}
 <script>
-document.getElementById('formRegistro').addEventListener('submit', function(e) {
-    e.preventDefault();
-    if (validarRegistro()) {
-        alert('Registro exitoso (simulado). Por favor iniciá sesión.');
-        window.location.href = '{{ url_for("login") }}';
+document.getElementById('formRegistro').addEventListener('submit', function (e) {
+    if (!validarRegistro()) {
+        e.preventDefault();
     }
 });
 </script>

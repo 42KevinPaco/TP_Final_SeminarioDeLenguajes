@@ -10,22 +10,23 @@
 <div class="auth-container">
     <div class="auth-card">
         <h1 class="auth-title">Iniciar Sesión</h1>
-        <form id="formLogin" class="auth-form" novalidate>
+        <form id="formLogin" class="auth-form" method="post" action="{{ url_for('login') }}" novalidate>
             <div class="form-group">
                 <label for="nombreUsuario" class="form-label">Nombre de Usuario</label>
-                <input type="text" id="nombreUsuario" name="nombreUsuario" class="form-input" required>
+                <input type="text" id="nombreUsuario" name="nombre_usuario" class="form-input"
+                       value="{{ form_data.get('nombre_usuario', '') }}" required>
                 <span class="error-message" id="error-nombreUsuario"></span>
             </div>
-            
+
             <div class="form-group">
                 <label for="contrasena" class="form-label">Contraseña</label>
                 <input type="password" id="contrasena" name="contrasena" class="form-input" required>
                 <span class="error-message" id="error-contrasena"></span>
             </div>
-            
+
             <button type="submit" class="btn btn-primary btn-full">Iniciar Sesión</button>
         </form>
-        
+
         <div class="auth-footer">
             <p>¿No tenés cuenta? <a href="{{ url_for('registro') }}">Registrate aquí</a></p>
         </div>
@@ -35,14 +36,9 @@
 
 {% block extra_js %}
 <script>
-document.getElementById('formLogin').addEventListener('submit', function(e) {
-    e.preventDefault();
-    if (validarLogin()) {
-        // Simulación de login - solo UI
-        sessionStorage.setItem('usuario', document.getElementById('nombreUsuario').value);
-        sessionStorage.setItem('tipo_usuario', 'cliente');
-        alert('Inicio de sesión exitoso (simulado)');
-        window.location.href = '{{ url_for("cliente_dashboard") }}';
+document.getElementById('formLogin').addEventListener('submit', function (e) {
+    if (!validarLogin()) {
+        e.preventDefault();
     }
 });
 </script>

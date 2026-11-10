@@ -9,37 +9,40 @@
 {% block content %}
 <div class="container">
     <h1 class="page-title">Sucursales Más Cercanas</h1>
-    
+
     <div class="mapa-layout">
         <section class="sucursales-lista">
             <h2>Listado de Sucursales</h2>
-            <div class="sucursal-item sucursal-cercana">
-                <h3>Sucursal Centro</h3>
-                <p><strong>Dirección:</strong> Av. Principal 123</p>
-                <p><strong>Latitud:</strong> -34.6037, <strong>Longitud:</strong> -58.3816</p>
-                <span class="badge-cercana">Más cercana</span>
-            </div>
-            <div class="sucursal-item">
-                <h3>Sucursal Norte</h3>
-                <p><strong>Dirección:</strong> Calle Norte 456</p>
-                <p><strong>Latitud:</strong> -34.5950, <strong>Longitud:</strong> -58.3800</p>
-            </div>
-            <div class="sucursal-item">
-                <h3>Sucursal Sur</h3>
-                <p><strong>Dirección:</strong> Av. Sur 789</p>
-                <p><strong>Latitud:</strong> -34.6200, <strong>Longitud:</strong> -58.4000</p>
-            </div>
+            {% for sucursal, distancia in sucursales %}
+                <div class="sucursal-item{% if loop.first %} sucursal-cercana{% endif %}">
+                    <h3>{{ sucursal.nombre }}</h3>
+                    <p><strong>Dirección:</strong> {{ sucursal.direccion }}</p>
+                    <p><strong>Distancia:</strong> {{ "%.2f"|format(distancia) }} km</p>
+                    <p><strong>Latitud:</strong> {{ "%.4f"|format(sucursal.latitud) }},
+                       <strong>Longitud:</strong> {{ "%.4f"|format(sucursal.longitud) }}</p>
+                    {% if loop.first %}
+                        <span class="badge-cercana">Más cercana</span>
+                    {% endif %}
+                </div>
+            {% else %}
+                <p>No hay sucursales cargadas.</p>
+            {% endfor %}
         </section>
-        
+
         <section class="mapa-container">
             <h2>Ubicación en Mapa</h2>
-            <iframe 
-                src="https://www.openstreetmap.org/export/embed.html?bbox=-58.41%2C-34.63%2C-58.37%2C-34.59&amp;layer=mapnik&amp;marker=-34.6037%2C-58.3816" 
-                width="100%" 
-                height="400" 
-                style="border:1px solid #ccc;">
-            </iframe>
-            <p class="mapa-nota">Mapa con sucursales hardcodeadas. Listo para reemplazar con integración de mapas.</p>
+            {% if sucursales %}
+                {% set cercana = sucursales[0][0] %}
+                <iframe
+                    src="https://www.openstreetmap.org/export/embed.html?bbox=-58.41%2C-34.63%2C-58.37%2C-34.59&amp;layer=mapnik&amp;marker={{ cercana.latitud }},{{ cercana.longitud }}"
+                    width="100%"
+                    height="400"
+                    style="border:1px solid #ccc;">
+                </iframe>
+                <p class="mapa-nota">Mapa centrado en la sucursal más cercana de la lista.</p>
+            {% else %}
+                <p class="mapa-nota">No hay sucursales para mostrar en el mapa.</p>
+            {% endif %}
         </section>
     </div>
 </div>
