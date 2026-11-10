@@ -91,3 +91,74 @@
     padding: 15px;
     border-top: 1px solid #eee;
 }
+
+/* Contador del carrito (header y catálogo) */
+.carrito-contador {
+    display: inline-block;
+    min-width: 20px;
+    padding: 0 6px;
+    border-radius: 10px;
+    background-color: #dc3545;
+    color: #fff;
+    font-size: 0.75em;
+    font-weight: bold;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.catalogo-encabezado {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.carrito-flotante {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 999px;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.carrito-flotante-icono {
+    font-size: 1.5em;
+    line-height: 1;
+}
+
+.product-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.product-card-cantidad {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.product-card-cantidad-label {
+    color: #666;
+    font-size: 0.85em;
+}
+
+.product-card-footer .input-cantidad {
+    width: 60px;
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.catalogo-vacio {
+    grid-column: 1 / -1;
+    color: #666;
+    text-align: center;
+}
