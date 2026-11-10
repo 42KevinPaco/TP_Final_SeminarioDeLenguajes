@@ -27,17 +27,6 @@ ROL_CLIENTE = 'cliente'
 
 
 # ---------------------------------------------------------------- guards
-def requerir_login(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not session.get('id_usuario'):
-            flash('Necesitás iniciar sesión para continuar', 'error')
-            return redirect(url_for('login', next=request.path))
-        return f(*args, **kwargs)
-
-    return decorated_function
-
-
 def requerir_admin(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
