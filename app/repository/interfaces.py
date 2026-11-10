@@ -9,6 +9,8 @@ so a SQL implementation can replace the CSV one without touching business code
 from abc import ABC, abstractmethod
 
 from app.models.producto import Producto
+from app.models.carrito import ItemCarrito
+from app.models.compra import Compra
 from app.models.sucursal import StockSucursal, Sucursal
 from app.models.usuario import Usuario
 
@@ -82,3 +84,41 @@ class IStockSucursalRepository(ABC):
 
     @abstractmethod
     def actualizar(self, stock: StockSucursal) -> StockSucursal: ...
+
+
+class ICarritoRepository(ABC):
+    """Persistence contract for one customer's cart lines."""
+
+    @abstractmethod
+    def listar_por_usuario(self, id_usuario: int) -> list[ItemCarrito]: ...
+
+    @abstractmethod
+    def obtener_item(self, id_usuario: int, id_producto: int) -> ItemCarrito | None: ...
+
+    @abstractmethod
+    def agregar(self, id_usuario: int, item: ItemCarrito) -> ItemCarrito: ...
+
+    @abstractmethod
+    def actualizar(self, id_usuario: int, item: ItemCarrito) -> ItemCarrito: ...
+
+    @abstractmethod
+    def eliminar(self, id_usuario: int, id_producto: int) -> None: ...
+
+    @abstractmethod
+    def vaciar(self, id_usuario: int) -> None: ...
+
+    @abstractmethod
+    def contar_unidades(self, id_usuario: int) -> int: ...
+
+
+class ICompraRepository(ABC):
+    """Persistence contract for confirmed purchases and their lines."""
+
+    @abstractmethod
+    def crear(self, compra: Compra) -> Compra: ...
+
+    @abstractmethod
+    def obtener_por_id(self, id_compra: int) -> Compra | None: ...
+
+    @abstractmethod
+    def listar_por_cliente(self, id_cliente: int) -> list[Compra]: ...
