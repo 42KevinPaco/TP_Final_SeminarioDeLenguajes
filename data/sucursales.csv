@@ -1,0 +1,4 @@
+id_sucursal,nombre,direccion,latitud,longitud
+1,Sucursal Centro,Av. Principal 123,-34.603700,-58.381600
+2,Sucursal Norte,Calle Norte 456,-34.595000,-58.380000
+3,Sucursal Sur,Av. Sur 789,-34.620000,-58.400000

@@ -1,0 +1,2 @@
+id_usuario,nombre_usuario,contrasena_hash,nombre,apellido,email,tipo,domicilio,telefono
+1,admin,scrypt:32768:8:1$OQRQkTyZPVhDxqj1$1afe1b3bdde86c77221d57389364d7d58f71d5e71ae7291627e3f24872ee4f5ad14178400c97433f180e2f9237308ddf11f0c631472553970e1266741eca727d,Administrador,General,admin@supermercado.local,administrador,,
