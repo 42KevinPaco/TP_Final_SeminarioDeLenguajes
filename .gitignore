@@ -33,6 +33,9 @@ MANIFEST
 *.spec
 .atl/
 
+# ODD local feature documents (no se suben)
+odd/
+
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
