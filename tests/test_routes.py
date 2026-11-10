@@ -171,9 +171,15 @@ class ClientPagesTest(RoutesTestCase):
         self.assertIn("Sucursal Centro", body)
         self.assertIn("km", body)
 
-    def test_cart_and_purchase_pages_render(self):
-        self.assertEqual(self.client.get("/cliente/carrito").status_code, 200)
-        self.assertEqual(self.client.get("/cliente/compra").status_code, 200)
+    def test_cart_page_renders_its_empty_state(self):
+        respuesta = self.client.get("/cliente/carrito")
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertIn("Tu carrito está vacío", respuesta.data.decode("utf-8"))
+
+    def test_purchase_page_redirects_when_the_cart_is_empty(self):
+        respuesta = self.client.get("/cliente/compra")
+        self.assertEqual(respuesta.status_code, 302)
+        self.assertIn("/cliente/carrito", respuesta.headers["Location"])
 
     def test_client_cannot_enter_the_admin_area(self):
         response = self.client.get("/admin/usuarios")
