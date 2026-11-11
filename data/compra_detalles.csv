@@ -5,3 +5,5 @@ id_detalle,id_compra,id_producto,nombre_producto,cantidad,precio_unitario
 4,2,3,Arroz,1,120.00
 5,2,5,Aceite de Girasol,1,780.00
 6,2,4,Yerba Mate,1,950.00
+7,3,6,Coca-Cola,1,6000.00
+8,4,6,Coca-Cola,1,6000.00

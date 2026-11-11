@@ -7,3 +7,6 @@ id_stock,id_producto,id_sucursal,cantidad_disponible
 6,1,2,20
 7,2,2,15
 8,3,3,35
+9,6,3,0
+10,9,1,5
+11,10,1,3
