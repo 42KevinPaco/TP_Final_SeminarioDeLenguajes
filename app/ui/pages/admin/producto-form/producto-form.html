@@ -8,7 +8,7 @@
         {% if producto %}Modificar Producto{% else %}Agregar Producto{% endif %}
     </h1>
 
-    <form method="post" class="admin-form" novalidate>
+    <form method="post" enctype="multipart/form-data" class="admin-form" novalidate>
         <div class="form-group">
             <label for="nombre" class="form-label">Nombre *</label>
             <input type="text" id="nombre" name="nombre" class="form-input"
@@ -32,6 +32,16 @@
                 <input type="text" id="marca" name="marca" class="form-input"
                        value="{{ form_data.get('marca') or (producto.marca if producto else '') }}">
             </div>
+        </div>
+
+        <div class="form-group">
+            <label for="imagen" class="form-label">Imagen (opcional)</label>
+            {% if producto and producto.imagen %}
+                <img src="{{ url_for('imagen_producto', nombre=producto.imagen) }}"
+                     alt="{{ producto.nombre }}" class="admin-miniatura">
+            {% endif %}
+            <input type="file" id="imagen" name="imagen" class="form-input"
+                   accept="image/jpeg,image/png,image/webp,image/gif">
         </div>
 
         <button type="submit" class="btn btn-primary">

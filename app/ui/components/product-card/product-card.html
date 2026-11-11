@@ -1,4 +1,11 @@
 <div class="product-card">
+    <div class="product-imagen">
+        {% if producto.imagen %}
+            <img src="{{ url_for('imagen_producto', nombre=producto.imagen) }}" alt="{{ producto.nombre }}">
+        {% else %}
+            <span class="product-imagen-placeholder" aria-hidden="true">&#128722;</span>
+        {% endif %}
+    </div>
     <div class="product-card-header">
         <h3 class="product-name">{{ producto.nombre }}</h3>
         <span class="product-brand">{{ producto.marca }}</span>

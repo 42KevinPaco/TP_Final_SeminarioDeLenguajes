@@ -17,6 +17,7 @@
     <table class="admin-table">
         <thead>
             <tr>
+                <th>Imagen</th>
                 <th>idProducto</th>
                 <th>nombre</th>
                 <th>descripcion</th>
@@ -28,6 +29,14 @@
         <tbody>
             {% for producto in productos %}
                 <tr>
+                    <td>
+                        {% if producto.imagen %}
+                            <img src="{{ url_for('imagen_producto', nombre=producto.imagen) }}"
+                                 alt="{{ producto.nombre }}" class="admin-miniatura">
+                        {% else %}
+                            <span class="admin-miniatura admin-miniatura-vacia" aria-hidden="true">&#128722;</span>
+                        {% endif %}
+                    </td>
                     <td>{{ producto.id_producto }}</td>
                     <td>{{ producto.nombre }}</td>
                     <td>{{ producto.descripcion }}</td>
@@ -45,7 +54,7 @@
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="6" class="tabla-vacia">No hay productos cargados.</td>
+                    <td colspan="7" class="tabla-vacia">No hay productos cargados.</td>
                 </tr>
             {% endfor %}
         </tbody>

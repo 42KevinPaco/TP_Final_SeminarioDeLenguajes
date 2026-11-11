@@ -7,12 +7,22 @@ Guards rely on the server-side session, never on client-side state.
 import os
 from functools import wraps
 
-from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
+from flask import (
+    Flask,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    send_from_directory,
+    session,
+    url_for,
+)
 
 from app.container import build_container
 from app.models.pago import PagoCredito, PagoDebito, PagoEfectivo
-from app.utils import validators
-from app.utils.config import SECRET_KEY
+from app.utils import imagenes, validators
+from app.utils.config import IMAGENES_DIR, SECRET_KEY
 from app.utils.exceptions import DatosInvalidosError, ErrorDeNegocio
 
 app = Flask(
@@ -369,11 +379,13 @@ def admin_sucursales():
     )
 
 
-def _producto_para_formulario(id_producto):
-    return container.producto_service.obtener(id_producto)
-
-
 # ------------------------------------------------------------ admin: producto
+@app.route('/imagenes/<nombre>')
+def imagen_producto(nombre):
+    """Serve one uploaded product image (guards path traversal)."""
+    return send_from_directory(IMAGENES_DIR, imagenes._nombre_seguro(nombre))
+
+
 @app.route('/admin/productos/nuevo', methods=['GET', 'POST'])
 @requerir_admin
 def admin_producto_nuevo():
@@ -384,6 +396,7 @@ def admin_producto_nuevo():
                 descripcion=request.form.get('descripcion', ''),
                 precio=request.form.get('precio', ''),
                 marca=request.form.get('marca', ''),
+                imagen=imagenes.guardar_imagen(request.files.get('imagen')),
             )
         except ErrorDeNegocio as error:
             flash(str(error), 'error')
@@ -407,36 +420,42 @@ def admin_producto_nuevo():
 @app.route('/admin/productos/<int:id_producto>/modificar', methods=['GET', 'POST'])
 @requerir_admin
 def admin_producto_modificar(id_producto):
+    try:
+        actual = container.producto_service.obtener(id_producto)
+    except ErrorDeNegocio as error:
+        flash(str(error), 'error')
+        return redirect(url_for('admin_productos'))
+
     if request.method == 'POST':
         try:
+            nueva_imagen = imagenes.guardar_imagen(request.files.get('imagen'))
             container.producto_service.actualizar(
                 id_producto,
                 nombre=request.form.get('nombre', ''),
                 descripcion=request.form.get('descripcion', ''),
                 precio=request.form.get('precio', ''),
                 marca=request.form.get('marca', ''),
+                imagen=nueva_imagen or None,
             )
         except ErrorDeNegocio as error:
             flash(str(error), 'error')
             return (
                 render_template(
                     'pages/admin/producto-form/producto-form.html',
-                    producto=container.producto_service.obtener(id_producto),
+                    producto=actual,
                     form_data=request.form,
                 ),
                 400,
             )
+        # Replace the old file only when a new image was actually uploaded.
+        if nueva_imagen and actual.imagen and nueva_imagen != actual.imagen:
+            imagenes.eliminar_imagen(actual.imagen)
         flash('Producto actualizado correctamente', 'success')
         return redirect(url_for('admin_productos'))
 
-    try:
-        producto = _producto_para_formulario(id_producto)
-    except ErrorDeNegocio as error:
-        flash(str(error), 'error')
-        return redirect(url_for('admin_productos'))
     return render_template(
         'pages/admin/producto-form/producto-form.html',
-        producto=producto,
+        producto=actual,
         form_data={},
     )
 
@@ -445,9 +464,11 @@ def admin_producto_modificar(id_producto):
 @requerir_admin
 def admin_producto_eliminar(id_producto):
     try:
+        producto = container.producto_service.obtener(id_producto)
         container.producto_service.eliminar(id_producto)
         # Cascade: a product without stock rows never shows stale rows.
         container.stock_service.eliminar_de_producto(id_producto)
+        imagenes.eliminar_imagen(producto.imagen)
     except ErrorDeNegocio as error:
         flash(str(error), 'error')
         return redirect(url_for('admin_productos'))
