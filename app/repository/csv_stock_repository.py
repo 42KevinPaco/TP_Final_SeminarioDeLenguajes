@@ -47,6 +47,24 @@ class CsvStockSucursalRepository(IStockSucursalRepository):
                 return stock
         raise ValueError(f"No existe el stock con id {stock.id_stock}")
 
+    def eliminar_por_producto(self, id_producto: int) -> None:
+        """Cascade: drop every stock row of a deleted product."""
+        self._filtrar_y_escribir(
+            lambda row: int(row["id_producto"]) != id_producto
+        )
+
+    def eliminar_por_sucursal(self, id_sucursal: int) -> None:
+        """Cascade: drop every stock row of a deleted branch."""
+        self._filtrar_y_escribir(
+            lambda row: int(row["id_sucursal"]) != id_sucursal
+        )
+
+    def _filtrar_y_escribir(self, mantener) -> None:
+        rows = self._table.read_rows()
+        restantes = [row for row in rows if mantener(row)]
+        if len(restantes) != len(rows):
+            self._table.write_rows(restantes)
+
     # ---------- mapping ----------
     def _to_model(self, row: dict[str, str]) -> StockSucursal:
         return StockSucursal(

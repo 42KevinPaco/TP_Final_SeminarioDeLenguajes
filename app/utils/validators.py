@@ -51,3 +51,14 @@ def validar_entero_positivo(valor, campo: str) -> int:
     if numero < 1:
         raise DatosInvalidosError(f"El campo {campo} debe ser mayor o igual a 1")
     return numero
+
+
+def validar_entero_no_negativo(valor, campo: str) -> int:
+    """Whole amount that may reach 0 (stock can legitimately sell out)."""
+    try:
+        numero = int(valor)
+    except (TypeError, ValueError) as exc:
+        raise DatosInvalidosError(f"El campo {campo} debe ser un número entero") from exc
+    if numero < 0:
+        raise DatosInvalidosError(f"El campo {campo} no puede ser negativo")
+    return numero

@@ -44,7 +44,7 @@ class StockService:
         )
 
     def actualizar_cantidad(self, id_stock: int, cantidad) -> StockSucursal:
-        cantidad_limpia = validators.validar_entero_positivo(cantidad, "cantidad")
+        cantidad_limpia = validators.validar_entero_no_negativo(cantidad, "cantidad")
         for stock in self._stock.listar():
             if stock.id_stock == id_stock:
                 stock.actualizar_stock(cantidad_limpia)
@@ -58,6 +58,14 @@ class StockService:
             raise StockInsuficienteError("Stock insuficiente en la sucursal seleccionada")
         stock.descontar_stock(cantidad_limpia)
         return self._stock.actualizar(stock)
+
+    def eliminar_de_producto(self, id_producto: int) -> None:
+        """Cascade helper for the admin product deletion flow."""
+        self._stock.eliminar_por_producto(id_producto)
+
+    def eliminar_de_sucursal(self, id_sucursal: int) -> None:
+        """Cascade helper for the admin branch deletion flow."""
+        self._stock.eliminar_por_sucursal(id_sucursal)
 
     def hay_disponibilidad(self, id_producto: int, id_sucursal: int, cantidad: int = 1) -> bool:
         stock = self._stock.obtener(id_producto, id_sucursal)

@@ -32,6 +32,24 @@ class CsvSucursalRepository(ISucursalRepository):
         self._table.append_row(self._to_row(creada))
         return creada
 
+    def actualizar(self, sucursal: Sucursal) -> Sucursal:
+        rows = self._table.read_rows()
+        for index, row in enumerate(rows):
+            if int(row["id_sucursal"]) == sucursal.id_sucursal:
+                rows[index] = self._to_row(sucursal)
+                self._table.write_rows(rows)
+                return sucursal
+        raise ValueError(f"No existe la sucursal con id {sucursal.id_sucursal}")
+
+    def eliminar(self, id_sucursal: int) -> None:
+        rows = self._table.read_rows()
+        restantes = [
+            row for row in rows if int(row["id_sucursal"]) != id_sucursal
+        ]
+        if len(restantes) == len(rows):
+            raise ValueError(f"No existe la sucursal con id {id_sucursal}")
+        self._table.write_rows(restantes)
+
     # ---------- mapping ----------
     def _to_model(self, row: dict[str, str]) -> Sucursal:
         return Sucursal(

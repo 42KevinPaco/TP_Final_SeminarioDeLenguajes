@@ -32,6 +32,18 @@ class SucursalService:
         )
         return self._sucursales.crear(sucursal)
 
+    def actualizar(self, id_sucursal: int, nombre: str, direccion: str, latitud, longitud) -> Sucursal:
+        actual = self.obtener(id_sucursal)
+        actual.nombre = validators.requerido(nombre, "nombre")
+        actual.direccion = validators.requerido(direccion, "dirección")
+        actual.latitud = _validar_coordenada(latitud, "latitud", -90, 90)
+        actual.longitud = _validar_coordenada(longitud, "longitud", -180, 180)
+        return self._sucursales.actualizar(actual)
+
+    def eliminar(self, id_sucursal: int) -> None:
+        self.obtener(id_sucursal)
+        self._sucursales.eliminar(id_sucursal)
+
     def listar_por_cercania(
         self,
         latitud: float | None = None,

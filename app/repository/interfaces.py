@@ -65,6 +65,12 @@ class ISucursalRepository(ABC):
     @abstractmethod
     def crear(self, sucursal: Sucursal) -> Sucursal: ...
 
+    @abstractmethod
+    def actualizar(self, sucursal: Sucursal) -> Sucursal: ...
+
+    @abstractmethod
+    def eliminar(self, id_sucursal: int) -> None: ...
+
 
 class IStockSucursalRepository(ABC):
     @abstractmethod
@@ -84,6 +90,12 @@ class IStockSucursalRepository(ABC):
 
     @abstractmethod
     def actualizar(self, stock: StockSucursal) -> StockSucursal: ...
+
+    @abstractmethod
+    def eliminar_por_producto(self, id_producto: int) -> None: ...
+
+    @abstractmethod
+    def eliminar_por_sucursal(self, id_sucursal: int) -> None: ...
 
 
 class ICarritoRepository(ABC):
