@@ -12,6 +12,7 @@ class Producto:
     descripcion: str
     precio: float
     marca: str
+    imagen: str = ""  # file name inside the images directory (optional)
 
     def __post_init__(self) -> None:
         if self.precio <= 0:

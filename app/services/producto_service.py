@@ -21,13 +21,21 @@ class ProductoService:
             raise RecursoNoEncontradoError("El producto no existe")
         return producto
 
-    def crear(self, nombre: str, descripcion: str, precio, marca: str) -> Producto:
+    def crear(
+        self,
+        nombre: str,
+        descripcion: str,
+        precio,
+        marca: str,
+        imagen: str = "",
+    ) -> Producto:
         producto = Producto(
             id_producto=0,
             nombre=validators.requerido(nombre, "nombre"),
             descripcion=validators.requerido(descripcion, "descripción"),
             precio=validators.validar_numero_positivo(precio, "precio"),
             marca=validators.requerido(marca, "marca"),
+            imagen=imagen,
         )
         return self._productos.crear(producto)
 
@@ -38,12 +46,15 @@ class ProductoService:
         descripcion: str,
         precio,
         marca: str,
+        imagen: str | None = None,
     ) -> Producto:
         actual = self.obtener(id_producto)
         actual.nombre = validators.requerido(nombre, "nombre")
         actual.descripcion = validators.requerido(descripcion, "descripción")
         actual.precio = validators.validar_numero_positivo(precio, "precio")
         actual.marca = validators.requerido(marca, "marca")
+        if imagen is not None:
+            actual.imagen = imagen
         return self._productos.actualizar(actual)
 
     def eliminar(self, id_producto: int) -> None:

@@ -8,7 +8,7 @@ from app.repository.csv_base import CsvTable
 from app.repository.interfaces import IProductoRepository
 from app.utils.config import DATA_DIR
 
-FIELDNAMES = ["id_producto", "nombre", "descripcion", "precio", "marca"]
+FIELDNAMES = ["id_producto", "nombre", "descripcion", "precio", "marca", "imagen"]
 
 
 class CsvProductoRepository(IProductoRepository):
@@ -53,6 +53,7 @@ class CsvProductoRepository(IProductoRepository):
             descripcion=row.get("descripcion", ""),
             precio=float(row.get("precio") or 0),
             marca=row.get("marca", ""),
+            imagen=row.get("imagen", ""),
         )
 
     def _to_row(self, producto: Producto) -> dict[str, str]:
@@ -62,4 +63,5 @@ class CsvProductoRepository(IProductoRepository):
             "descripcion": producto.descripcion,
             "precio": f"{producto.precio:.2f}",
             "marca": producto.marca,
+            "imagen": producto.imagen,
         }
