@@ -11,7 +11,7 @@
     <h1 class="page-title">Administración de Productos</h1>
 
     <div class="admin-header">
-        <button class="btn btn-primary" disabled>Agregar Producto</button>
+        <a href="{{ url_for('admin_producto_nuevo') }}" class="btn btn-primary">Agregar Producto</a>
     </div>
 
     <table class="admin-table">
@@ -34,8 +34,13 @@
                     <td>$ {{ "%.2f"|format(producto.precio) }}</td>
                     <td>{{ producto.marca }}</td>
                     <td>
-                        <button class="btn btn-small btn-secondary" disabled>Modificar</button>
-                        <button class="btn btn-small btn-danger" disabled>Eliminar</button>
+                        <a href="{{ url_for('admin_producto_modificar', id_producto=producto.id_producto) }}"
+                           class="btn btn-small btn-secondary">Modificar</a>
+                        <form method="post" class="inline-form"
+                              action="{{ url_for('admin_producto_eliminar', id_producto=producto.id_producto) }}"
+                              onsubmit="return confirm('¿Eliminar el producto {{ producto.nombre }}? También se borra su stock.');">
+                            <button type="submit" class="btn btn-small btn-danger">Eliminar</button>
+                        </form>
                     </td>
                 </tr>
             {% else %}

@@ -13,7 +13,7 @@
     <section class="admin-section">
         <div class="admin-header">
             <h2>Sucursales</h2>
-            <button class="btn btn-primary" disabled>Agregar Sucursal</button>
+            <a href="{{ url_for('admin_sucursal_nueva') }}" class="btn btn-primary">Agregar Sucursal</a>
         </div>
 
         <table class="admin-table">
@@ -36,8 +36,13 @@
                         <td>{{ "%.4f"|format(sucursal.latitud) }}</td>
                         <td>{{ "%.4f"|format(sucursal.longitud) }}</td>
                         <td>
-                            <button class="btn btn-small btn-secondary" disabled>Modificar</button>
-                            <button class="btn btn-small btn-danger" disabled>Eliminar</button>
+                            <a href="{{ url_for('admin_sucursal_modificar', id_sucursal=sucursal.id_sucursal) }}"
+                               class="btn btn-small btn-secondary">Modificar</a>
+                            <form method="post" class="inline-form"
+                                  action="{{ url_for('admin_sucursal_eliminar', id_sucursal=sucursal.id_sucursal) }}"
+                                  onsubmit="return confirm('¿Eliminar la sucursal {{ sucursal.nombre }}? También se borra su stock.');">
+                                <button type="submit" class="btn btn-small btn-danger">Eliminar</button>
+                            </form>
                         </td>
                     </tr>
                 {% else %}
@@ -52,7 +57,7 @@
     <section class="admin-section">
         <div class="admin-header">
             <h2>Stock por Sucursal (StockSucursal)</h2>
-            <button class="btn btn-primary" disabled>Asignar Stock</button>
+            <a href="{{ url_for('admin_stock_asignar') }}" class="btn btn-primary">Asignar Stock</a>
         </div>
 
         <table class="admin-table">
@@ -73,7 +78,12 @@
                         <td>{{ fila.sucursal.nombre if fila.sucursal else 'Sucursal eliminada' }}</td>
                         <td>{{ fila.stock.cantidad_disponible }}</td>
                         <td>
-                            <button class="btn btn-small btn-secondary" disabled>Actualizar Stock</button>
+                            <form method="post" class="inline-form inline-form-stock"
+                                  action="{{ url_for('admin_stock_actualizar', id_stock=fila.stock.id_stock) }}">
+                                <input type="number" name="cantidad" class="input-cantidad"
+                                       min="0" step="1" value="{{ fila.stock.cantidad_disponible }}">
+                                <button type="submit" class="btn btn-small btn-secondary">Actualizar Stock</button>
+                            </form>
                         </td>
                     </tr>
                 {% else %}

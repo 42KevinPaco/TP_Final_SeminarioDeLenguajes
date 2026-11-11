@@ -367,3 +367,220 @@ def admin_sucursales():
         sucursales=sucursales,
         filas_stock=filas_stock,
     )
+
+
+def _producto_para_formulario(id_producto):
+    return container.producto_service.obtener(id_producto)
+
+
+# ------------------------------------------------------------ admin: producto
+@app.route('/admin/productos/nuevo', methods=['GET', 'POST'])
+@requerir_admin
+def admin_producto_nuevo():
+    if request.method == 'POST':
+        try:
+            producto = container.producto_service.crear(
+                nombre=request.form.get('nombre', ''),
+                descripcion=request.form.get('descripcion', ''),
+                precio=request.form.get('precio', ''),
+                marca=request.form.get('marca', ''),
+            )
+        except ErrorDeNegocio as error:
+            flash(str(error), 'error')
+            return (
+                render_template(
+                    'pages/admin/producto-form/producto-form.html',
+                    producto=None,
+                    form_data=request.form,
+                ),
+                400,
+            )
+        flash(f'Producto "{producto.nombre}" creado correctamente', 'success')
+        return redirect(url_for('admin_productos'))
+    return render_template(
+        'pages/admin/producto-form/producto-form.html',
+        producto=None,
+        form_data={},
+    )
+
+
+@app.route('/admin/productos/<int:id_producto>/modificar', methods=['GET', 'POST'])
+@requerir_admin
+def admin_producto_modificar(id_producto):
+    if request.method == 'POST':
+        try:
+            container.producto_service.actualizar(
+                id_producto,
+                nombre=request.form.get('nombre', ''),
+                descripcion=request.form.get('descripcion', ''),
+                precio=request.form.get('precio', ''),
+                marca=request.form.get('marca', ''),
+            )
+        except ErrorDeNegocio as error:
+            flash(str(error), 'error')
+            return (
+                render_template(
+                    'pages/admin/producto-form/producto-form.html',
+                    producto=container.producto_service.obtener(id_producto),
+                    form_data=request.form,
+                ),
+                400,
+            )
+        flash('Producto actualizado correctamente', 'success')
+        return redirect(url_for('admin_productos'))
+
+    try:
+        producto = _producto_para_formulario(id_producto)
+    except ErrorDeNegocio as error:
+        flash(str(error), 'error')
+        return redirect(url_for('admin_productos'))
+    return render_template(
+        'pages/admin/producto-form/producto-form.html',
+        producto=producto,
+        form_data={},
+    )
+
+
+@app.route('/admin/productos/<int:id_producto>/eliminar', methods=['POST'])
+@requerir_admin
+def admin_producto_eliminar(id_producto):
+    try:
+        container.producto_service.eliminar(id_producto)
+        # Cascade: a product without stock rows never shows stale rows.
+        container.stock_service.eliminar_de_producto(id_producto)
+    except ErrorDeNegocio as error:
+        flash(str(error), 'error')
+        return redirect(url_for('admin_productos'))
+    flash('Producto eliminado correctamente', 'success')
+    return redirect(url_for('admin_productos'))
+
+
+# ------------------------------------------------------------ admin: sucursal
+@app.route('/admin/sucursales/nueva', methods=['GET', 'POST'])
+@requerir_admin
+def admin_sucursal_nueva():
+    if request.method == 'POST':
+        try:
+            sucursal = container.sucursal_service.crear(
+                nombre=request.form.get('nombre', ''),
+                direccion=request.form.get('direccion', ''),
+                latitud=request.form.get('latitud', ''),
+                longitud=request.form.get('longitud', ''),
+            )
+        except ErrorDeNegocio as error:
+            flash(str(error), 'error')
+            return (
+                render_template(
+                    'pages/admin/sucursal-form/sucursal-form.html',
+                    sucursal=None,
+                    form_data=request.form,
+                ),
+                400,
+            )
+        flash(f'Sucursal "{sucursal.nombre}" creada correctamente', 'success')
+        return redirect(url_for('admin_sucursales'))
+    return render_template(
+        'pages/admin/sucursal-form/sucursal-form.html',
+        sucursal=None,
+        form_data={},
+    )
+
+
+@app.route('/admin/sucursales/<int:id_sucursal>/modificar', methods=['GET', 'POST'])
+@requerir_admin
+def admin_sucursal_modificar(id_sucursal):
+    if request.method == 'POST':
+        try:
+            container.sucursal_service.actualizar(
+                id_sucursal,
+                nombre=request.form.get('nombre', ''),
+                direccion=request.form.get('direccion', ''),
+                latitud=request.form.get('latitud', ''),
+                longitud=request.form.get('longitud', ''),
+            )
+        except ErrorDeNegocio as error:
+            flash(str(error), 'error')
+            return (
+                render_template(
+                    'pages/admin/sucursal-form/sucursal-form.html',
+                    sucursal=container.sucursal_service.obtener(id_sucursal),
+                    form_data=request.form,
+                ),
+                400,
+            )
+        flash('Sucursal actualizada correctamente', 'success')
+        return redirect(url_for('admin_sucursales'))
+
+    try:
+        sucursal = container.sucursal_service.obtener(id_sucursal)
+    except ErrorDeNegocio as error:
+        flash(str(error), 'error')
+        return redirect(url_for('admin_sucursales'))
+    return render_template(
+        'pages/admin/sucursal-form/sucursal-form.html',
+        sucursal=sucursal,
+        form_data={},
+    )
+
+
+@app.route('/admin/sucursales/<int:id_sucursal>/eliminar', methods=['POST'])
+@requerir_admin
+def admin_sucursal_eliminar(id_sucursal):
+    try:
+        container.sucursal_service.eliminar(id_sucursal)
+        # Cascade: a branch without stock rows never shows stale rows.
+        container.stock_service.eliminar_de_sucursal(id_sucursal)
+    except ErrorDeNegocio as error:
+        flash(str(error), 'error')
+        return redirect(url_for('admin_sucursales'))
+    flash('Sucursal eliminada correctamente', 'success')
+    return redirect(url_for('admin_sucursales'))
+
+
+# ------------------------------------------------------------ admin: stock
+@app.route('/admin/stock/asignar', methods=['GET', 'POST'])
+@requerir_admin
+def admin_stock_asignar():
+    if request.method == 'POST':
+        try:
+            id_producto = validators.validar_entero_positivo(
+                request.form.get('id_producto'), 'producto'
+            )
+            id_sucursal = validators.validar_entero_positivo(
+                request.form.get('id_sucursal'), 'sucursal'
+            )
+            container.stock_service.asignar(
+                id_producto,
+                id_sucursal,
+                request.form.get('cantidad', ''),
+            )
+        except ErrorDeNegocio as error:
+            flash(str(error), 'error')
+            return _render_stock_form(status=400)
+        flash('Stock asignado correctamente', 'success')
+        return redirect(url_for('admin_sucursales'))
+    return _render_stock_form()
+
+
+def _render_stock_form(status: int = 200):
+    return (
+        render_template(
+            'pages/admin/stock-form/stock-form.html',
+            productos=container.producto_service.listar(),
+            sucursales=container.sucursal_service.listar(),
+            form_data=request.form,
+        ),
+        status,
+    )
+
+
+@app.route('/admin/stock/<int:id_stock>/actualizar', methods=['POST'])
+@requerir_admin
+def admin_stock_actualizar(id_stock):
+    try:
+        container.stock_service.actualizar_cantidad(id_stock, request.form.get('cantidad'))
+    except ErrorDeNegocio as error:
+        flash(str(error), 'error')
+        return redirect(url_for('admin_sucursales'))
+    flash('Stock actualizado correctamente', 'success')
+    return redirect(url_for('admin_sucursales'))

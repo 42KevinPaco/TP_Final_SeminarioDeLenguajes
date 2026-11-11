@@ -56,3 +56,35 @@
     margin-bottom: 20px;
     color: #333;
 }
+
+/* Formularios del panel admin */
+.admin-form {
+    max-width: 560px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.admin-form .btn {
+    margin-right: 10px;
+}
+
+/* Formularios embebidos en las tablas */
+.inline-form {
+    display: inline;
+    margin: 0;
+}
+
+.inline-form-stock {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.inline-form-stock .input-cantidad {
+    width: 70px;
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}

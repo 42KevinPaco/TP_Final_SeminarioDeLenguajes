@@ -1,0 +1,50 @@
+{% extends "components/base/layout.html" %}
+
+{% block title %}Asignar Stock - Supermercado E-commerce{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="page-title">Asignar Stock</h1>
+
+    <p class="admin-nota">
+        Si el producto ya tiene stock en esa sucursal, la cantidad se reemplaza.
+    </p>
+
+    <form method="post" class="admin-form" novalidate>
+        <div class="form-group">
+            <label for="id_producto" class="form-label">Producto *</label>
+            <select id="id_producto" name="id_producto" class="form-select">
+                <option value="">Seleccione un producto</option>
+                {% for producto in productos %}
+                    <option value="{{ producto.id_producto }}"
+                        {% if form_data.get('id_producto') == producto.id_producto|string %}selected{% endif %}>
+                        {{ producto.nombre }} ({{ producto.marca }})
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="id_sucursal" class="form-label">Sucursal *</label>
+            <select id="id_sucursal" name="id_sucursal" class="form-select">
+                <option value="">Seleccione una sucursal</option>
+                {% for sucursal in sucursales %}
+                    <option value="{{ sucursal.id_sucursal }}"
+                        {% if form_data.get('id_sucursal') == sucursal.id_sucursal|string %}selected{% endif %}>
+                        {{ sucursal.nombre }} - {{ sucursal.direccion }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="cantidad" class="form-label">Cantidad *</label>
+            <input type="number" id="cantidad" name="cantidad" class="form-input"
+                   min="1" step="1" value="{{ form_data.get('cantidad', '') }}">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Asignar stock</button>
+        <a href="{{ url_for('admin_sucursales') }}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}
