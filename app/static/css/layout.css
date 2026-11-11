@@ -42,7 +42,7 @@
 }
 
 .nav-link:hover {
-    background-color: var(--verde-tinte);
+    background-color: #f3f4f6;
     color: var(--verde-oscuro);
 }
 
