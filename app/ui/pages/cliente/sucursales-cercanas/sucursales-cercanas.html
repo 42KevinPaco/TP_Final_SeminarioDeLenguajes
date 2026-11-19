@@ -2,44 +2,69 @@
 
 {% block title %}Sucursales Cercanas - Supermercado E-commerce{% endblock %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/mapa.css') }}">
-{% endblock %}
-
 {% block content %}
 <div class="container">
     <h1 class="page-title">Sucursales Más Cercanas</h1>
-    
+
+    <section class="ubicacion-cliente">
+        <p>
+            {% if ubicacion_real %}
+                Tu ubicación: {{ "%.4f"|format(latitud) }}, {{ "%.4f"|format(longitud) }}.
+            {% else %}
+                Todavía no indicaste tu ubicación: las distancias se calculan desde un punto de referencia.
+            {% endif %}
+        </p>
+        <button type="button" class="btn btn-primary" id="btn-ubicacion"
+                data-geolocalizar data-destino="{{ url_for('cliente_sucursales_cercanas') }}">
+            Usar mi ubicación
+        </button>
+        <span class="error-message" id="error-ubicacion"></span>
+        <form method="get" action="{{ url_for('cliente_sucursales_cercanas') }}" class="form-ubicacion">
+            <input type="number" name="lat" class="form-input" step="any" min="-90" max="90"
+                   placeholder="Latitud" required>
+            <input type="number" name="lon" class="form-input" step="any" min="-180" max="180"
+                   placeholder="Longitud" required>
+            <button type="submit" class="btn btn-secondary">Calcular</button>
+        </form>
+    </section>
+
     <div class="mapa-layout">
         <section class="sucursales-lista">
             <h2>Listado de Sucursales</h2>
-            <div class="sucursal-item sucursal-cercana">
-                <h3>Sucursal Centro</h3>
-                <p><strong>Dirección:</strong> Av. Principal 123</p>
-                <p><strong>Latitud:</strong> -34.6037, <strong>Longitud:</strong> -58.3816</p>
-                <span class="badge-cercana">Más cercana</span>
-            </div>
-            <div class="sucursal-item">
-                <h3>Sucursal Norte</h3>
-                <p><strong>Dirección:</strong> Calle Norte 456</p>
-                <p><strong>Latitud:</strong> -34.5950, <strong>Longitud:</strong> -58.3800</p>
-            </div>
-            <div class="sucursal-item">
-                <h3>Sucursal Sur</h3>
-                <p><strong>Dirección:</strong> Av. Sur 789</p>
-                <p><strong>Latitud:</strong> -34.6200, <strong>Longitud:</strong> -58.4000</p>
-            </div>
+            {% for sucursal, distancia in sucursales %}
+                <div class="sucursal-item{% if loop.first %} sucursal-cercana{% endif %}">
+                    <h3>{{ sucursal.nombre }}</h3>
+                    <p><strong>Dirección:</strong> {{ sucursal.direccion }}</p>
+                    <p><strong>Distancia:</strong> {{ "%.2f"|format(distancia) }} km</p>
+                    <p><strong>Latitud:</strong> {{ "%.4f"|format(sucursal.latitud) }},
+                       <strong>Longitud:</strong> {{ "%.4f"|format(sucursal.longitud) }}</p>
+                    {% if loop.first %}
+                        <span class="badge-cercana">Más cercana</span>
+                    {% endif %}
+                </div>
+            {% else %}
+                <p>No hay sucursales cargadas.</p>
+            {% endfor %}
+            {% if sucursales %}
+                <a href="{{ url_for('cliente_compra') }}" class="btn btn-primary">Ir a comprar</a>
+            {% endif %}
         </section>
-        
+
         <section class="mapa-container">
             <h2>Ubicación en Mapa</h2>
-            <iframe 
-                src="https://www.openstreetmap.org/export/embed.html?bbox=-58.41%2C-34.63%2C-58.37%2C-34.59&amp;layer=mapnik&amp;marker=-34.6037%2C-58.3816" 
-                width="100%" 
-                height="400" 
-                style="border:1px solid #ccc;">
-            </iframe>
-            <p class="mapa-nota">Mapa con sucursales hardcodeadas. Listo para reemplazar con integración de mapas.</p>
+            {% if sucursales %}
+                {% set cercana = sucursales[0][0] %}
+                <iframe
+                    src="https://www.openstreetmap.org/export/embed.html?bbox={{ bbox|urlencode }}&amp;layer=mapnik&amp;marker={{ cercana.latitud }}%2C{{ cercana.longitud }}"
+                    width="100%"
+                    height="400"
+                    style="border:1px solid #ccc;"
+                    title="Mapa de la sucursal más cercana">
+                </iframe>
+                <p class="mapa-nota">El marcador señala la sucursal más cercana: {{ cercana.nombre }}.</p>
+            {% else %}
+                <p class="mapa-nota">No hay sucursales para mostrar en el mapa.</p>
+            {% endif %}
         </section>
     </div>
 </div>

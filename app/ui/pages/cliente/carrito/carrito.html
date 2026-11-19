@@ -9,7 +9,7 @@
 {% block content %}
 <div class="container">
     <h1 class="page-title">Carrito de Compras</h1>
-    
+
     <div class="carrito-container">
         <table class="table">
             <thead>
@@ -21,35 +21,38 @@
                     <th>Acciones</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td>Leche Entera</td>
-                    <td>$150.00</td>
-                    <td>
-                        <input type="number" value="2" min="1" class="input-cantidad">
-                    </td>
-                    <td>$300.00</td>
-                    <td>
-                        <button class="btn btn-danger btn-small">Eliminar</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Pan Lactal</td>
-                    <td>$200.00</td>
-                    <td>
-                        <input type="number" value="1" min="1" class="input-cantidad">
-                    </td>
-                    <td>$200.00</td>
-                    <td>
-                        <button class="btn btn-danger btn-small">Eliminar</button>
-                    </td>
-                </tr>
+            <tbody id="carrito-items">
+                {% for item in items %}
+                    <tr data-item-carrito data-id-producto="{{ item.producto.id_producto }}"
+                        data-precio="{{ item.precio_unitario }}">
+                        <td>{{ item.producto.nombre }}</td>
+                        <td>$ {{ "%.2f"|format(item.precio_unitario) }}</td>
+                        <td>
+                            <input type="number" value="{{ item.cantidad }}" min="1" step="1"
+                                   class="input-cantidad"
+                                   onchange="actualizarCantidad({{ item.producto.id_producto }}, this.value)">
+                        </td>
+                        <td data-subtotal>$ {{ "%.2f"|format(item.subtotal) }}</td>
+                        <td>
+                            <button type="button" class="btn btn-danger btn-small"
+                                    onclick="eliminarDelCarrito({{ item.producto.id_producto }})">Eliminar</button>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr id="carrito-vacio">
+                        <td colspan="5" class="tabla-vacia">Tu carrito está vacío.</td>
+                    </tr>
+                {% endfor %}
             </tbody>
         </table>
-        
+
         <div class="carrito-total">
-            <h3>Total: $500.00</h3>
-            <a href="{{ url_for('cliente_compra') }}" class="btn btn-primary">Comprar</a>
+            <h3>Total: <span id="total-carrito">$ {{ "%.2f"|format(carrito.calcular_total()) }}</span></h3>
+            {% if items %}
+                <a href="{{ url_for('cliente_compra') }}" class="btn btn-primary">Comprar</a>
+            {% else %}
+                <a href="{{ url_for('catalogo') }}" class="btn btn-secondary">Ver catálogo</a>
+            {% endif %}
         </div>
     </div>
 </div>

@@ -15,15 +15,23 @@
 .banner-item {
     flex: 1;
     min-width: 250px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background-color: var(--tarjeta);
+    border: 1px solid var(--borde);
+    border-top: 4px solid var(--ambar);
+    color: var(--texto);
     padding: 20px;
-    border-radius: 8px;
+    border-radius: var(--radio);
     text-align: center;
+    box-shadow: var(--sombra);
 }
 
 .banner-item h3 {
     margin-bottom: 5px;
+    color: var(--texto);
+}
+
+.banner-item p {
+    color: var(--texto-suave);
 }
 
 .productos-section {
@@ -42,11 +50,32 @@
 }
 
 .product-card {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    background-color: var(--tarjeta);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
     overflow: hidden;
     transition: transform 0.2s;
+}
+
+.product-imagen {
+    height: 160px;
+    background-color: #f1f3f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.product-imagen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.product-imagen-placeholder {
+    font-size: 3em;
+    color: #adb5bd;
 }
 
 .product-card:hover {
@@ -82,7 +111,7 @@
 }
 
 .product-price {
-    color: #28a745;
+    color: var(--verde);
     font-size: 1.3em;
     font-weight: bold;
 }
@@ -90,4 +119,75 @@
 .product-card-footer {
     padding: 15px;
     border-top: 1px solid #eee;
+}
+
+/* Contador del carrito (header y catálogo) */
+.carrito-contador {
+    display: inline-block;
+    min-width: 20px;
+    padding: 0 6px;
+    border-radius: 10px;
+    background-color: #dc3545;
+    color: #fff;
+    font-size: 0.75em;
+    font-weight: bold;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.catalogo-encabezado {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.carrito-flotante {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 999px;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.carrito-flotante-icono {
+    font-size: 1.5em;
+    line-height: 1;
+}
+
+.product-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.product-card-cantidad {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.product-card-cantidad-label {
+    color: #666;
+    font-size: 0.85em;
+}
+
+.product-card-footer .input-cantidad {
+    width: 60px;
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.catalogo-vacio {
+    grid-column: 1 / -1;
+    color: #666;
+    text-align: center;
 }

@@ -36,7 +36,7 @@
 }
 
 .auth-footer a {
-    color: #007bff;
+    color: var(--verde);
     text-decoration: none;
 }
 
