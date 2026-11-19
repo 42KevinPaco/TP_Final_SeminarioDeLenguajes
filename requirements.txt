@@ -1,2 +1,3 @@
-# El proyecto inicial solo utiliza la biblioteca estándar de Python.
-# No se requieren dependencias externas por el momento.
+# Dependencias del proyecto.
+# Flask incluye Werkzeug, que aporta el hashing de contraseñas (scrypt).
+Flask>=3.0

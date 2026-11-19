@@ -9,14 +9,15 @@
 {% block content %}
 <div class="container">
     <h1 class="page-title">Administración de Productos</h1>
-    
+
     <div class="admin-header">
-        <button class="btn btn-primary">Agregar Producto</button>
+        <a href="{{ url_for('admin_producto_nuevo') }}" class="btn btn-primary">Agregar Producto</a>
     </div>
-    
+
     <table class="admin-table">
         <thead>
             <tr>
+                <th>Imagen</th>
                 <th>idProducto</th>
                 <th>nombre</th>
                 <th>descripcion</th>
@@ -26,28 +27,37 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>1</td>
-                <td>Leche Entera</td>
-                <td>Leche entera pasteurizada 1L</td>
-                <td>$150.00</td>
-                <td>La Serenísima</td>
-                <td>
-                    <button class="btn btn-small btn-secondary">Modificar</button>
-                    <button class="btn btn-small btn-danger">Eliminar</button>
-                </td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>Pan Lactal</td>
-                <td>Pan lactal blanco 500g</td>
-                <td>$200.00</td>
-                <td>Bimbo</td>
-                <td>
-                    <button class="btn btn-small btn-secondary">Modificar</button>
-                    <button class="btn btn-small btn-danger">Eliminar</button>
-                </td>
-            </tr>
+            {% for producto in productos %}
+                <tr>
+                    <td>
+                        {% if producto.imagen %}
+                            <img src="{{ url_for('imagen_producto', nombre=producto.imagen) }}"
+                                 alt="{{ producto.nombre }}" class="admin-miniatura">
+                        {% else %}
+                            <span class="admin-miniatura admin-miniatura-vacia" aria-hidden="true">&#128722;</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ producto.id_producto }}</td>
+                    <td>{{ producto.nombre }}</td>
+                    <td>{{ producto.descripcion }}</td>
+                    <td>$ {{ "%.2f"|format(producto.precio) }}</td>
+                    <td>{{ producto.marca }}</td>
+                    <td>
+                        <a href="{{ url_for('admin_producto_modificar', id_producto=producto.id_producto) }}"
+                           class="btn btn-small btn-secondary">Modificar</a>
+                        <form method="post" class="inline-form"
+                              action="{{ url_for('admin_producto_eliminar', id_producto=producto.id_producto) }}"
+                              onsubmit="return confirm('¿Eliminar el producto {{ producto.nombre }}? También se borra su stock.');">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-small btn-danger">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="7" class="tabla-vacia">No hay productos cargados.</td>
+                </tr>
+            {% endfor %}
         </tbody>
     </table>
 </div>

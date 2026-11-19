@@ -1,4 +1,11 @@
 <div class="product-card">
+    <div class="product-imagen">
+        {% if producto.imagen %}
+            <img src="{{ url_for('imagen_producto', nombre=producto.imagen) }}" alt="{{ producto.nombre }}">
+        {% else %}
+            <span class="product-imagen-placeholder" aria-hidden="true">&#128722;</span>
+        {% endif %}
+    </div>
     <div class="product-card-header">
         <h3 class="product-name">{{ producto.nombre }}</h3>
         <span class="product-brand">{{ producto.marca }}</span>
@@ -6,8 +13,26 @@
     <div class="product-card-body">
         <p class="product-description">{{ producto.descripcion }}</p>
         <p class="product-price">$ {{ "%.2f"|format(producto.precio) }}</p>
+        {% if item.disponible %}
+            <p class="product-stock stock-ok">Disponible: {{ item.stock_total }} unidad(es)</p>
+            <details class="product-stock-detalle">
+                <summary>Stock por sucursal</summary>
+                <ul>
+                    {% for sucursal, cantidad in item.por_sucursal %}
+                        <li>{{ sucursal.nombre }}: {{ cantidad if cantidad > 0 else 'sin stock' }}</li>
+                    {% endfor %}
+                </ul>
+            </details>
+        {% else %}
+            <p class="product-stock stock-agotado">Sin stock por el momento</p>
+        {% endif %}
     </div>
     <div class="product-card-footer">
-        <button class="btn btn-primary" onclick="agregarAlCarrito({{ producto.idProducto }})">Agregar al carrito</button>
+        <div class="product-card-cantidad">
+            <label for="cantidad-{{ producto.id_producto }}" class="product-card-cantidad-label">Cantidad</label>
+            <input type="number" id="cantidad-{{ producto.id_producto }}" class="input-cantidad"
+                   value="1" min="1" step="1"{% if item.disponible %} max="{{ item.stock_total }}"{% else %} disabled{% endif %}>
+        </div>
+        <button class="btn btn-primary" onclick="agregarAlCarrito({{ producto.id_producto }})"{% if not item.disponible %} disabled{% endif %}>Agregar al carrito</button>
     </div>
 </div>

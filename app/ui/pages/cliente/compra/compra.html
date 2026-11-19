@@ -9,7 +9,7 @@
 {% block content %}
 <div class="container">
     <h1 class="page-title">Confirmar Compra</h1>
-    
+
     <div class="compra-layout">
         <section class="compra-resumen">
             <h2>Resumen de Compra</h2>
@@ -23,82 +23,127 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Leche Entera</td>
-                        <td>2</td>
-                        <td>$150.00</td>
-                        <td>$300.00</td>
-                    </tr>
-                    <tr>
-                        <td>Pan Lactal</td>
-                        <td>1</td>
-                        <td>$200.00</td>
-                        <td>$200.00</td>
-                    </tr>
+                    {% for detalle in detalles %}
+                        <tr>
+                            <td>{{ detalle.nombre_producto }}</td>
+                            <td>{{ detalle.cantidad }}</td>
+                            <td>$ {{ "%.2f"|format(detalle.precio_unitario) }}</td>
+                            <td>$ {{ "%.2f"|format(detalle.subtotal) }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="tabla-vacia">Todavía no hay productos en la compra.</td>
+                        </tr>
+                    {% endfor %}
                 </tbody>
             </table>
             <div class="compra-total">
-                <strong>Total: $500.00</strong>
+                <strong>Total: $ {{ "%.2f"|format(total) }}</strong>
             </div>
         </section>
-        
+
         <section class="compra-pago">
             <h2>Datos de Compra</h2>
-            
-            <div class="form-group">
-                <label for="sucursal" class="form-label">Seleccionar Sucursal *</label>
-                <select id="sucursal" class="form-select" required>
-                    <option value="">Seleccione una sucursal</option>
-                    <option value="1">Sucursal Centro - Av. Principal 123</option>
-                    <option value="2">Sucursal Norte - Calle Norte 456</option>
-                    <option value="3">Sucursal Sur - Av. Sur 789</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Método de Pago *</label>
-                <select id="metodoPago" class="form-select" onchange="mostrarFormularioTarjeta()" required>
-                    <option value="">Seleccione método de pago</option>
-                    <option value="efectivo">Pago en Efectivo</option>
-                    <option value="debito">Tarjeta de Débito</option>
-                    <option value="credito">Tarjeta de Crédito</option>
-                </select>
-            </div>
-            
-            <div id="form-tarjeta" class="form-tarjeta" style="display: none;">
-                <h3>Datos de Tarjeta</h3>
+
+            <form id="formCompra" method="post" action="{{ url_for('cliente_compra') }}" novalidate
+                  onsubmit="return validarCompra();">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="form-group">
-                    <label for="numeroTarjeta" class="form-label">Número de Tarjeta *</label>
-                    <input type="text" id="numeroTarjeta" class="form-input" pattern="[0-9]{16}" placeholder="1234567812345678" maxlength="16">
+                    <label for="sucursal" class="form-label">Seleccionar Sucursal *</label>
+                    <select id="sucursal" name="sucursal" class="form-select">
+                        <option value="">Seleccione una sucursal</option>
+                        {% for opcion in opciones %}
+                            <option value="{{ opcion.sucursal.id_sucursal }}"
+                                {% if elegida == opcion.sucursal.id_sucursal|string %}selected{% endif %}
+                                {% if not opcion.completa %}disabled{% endif %}>
+                                {{ opcion.sucursal.nombre }} - {{ opcion.sucursal.direccion }}
+                                ({{ "%.1f"|format(opcion.distancia_km) }} km)
+                                {% if not opcion.completa %}— sin stock de {{ opcion.faltantes|join(', ') }}{% endif %}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <span class="error-message" id="error-sucursal"></span>
+                    <p class="form-ayuda">
+                        {% if ubicacion_real %}Ordenadas por distancia a tu ubicación.{% else %}Distancias calculadas desde un punto de referencia.{% endif %}
+                        <a href="{{ url_for('cliente_sucursales_cercanas') }}">Indicar mi ubicación</a>
+                    </p>
                 </div>
+
                 <div class="form-group">
-                    <label for="titular" class="form-label">Nombre del Titular *</label>
-                    <input type="text" id="titular" class="form-input" placeholder="Como figura en la tarjeta">
+                    <label for="metodoPago" class="form-label">Método de Pago *</label>
+                    <select id="metodoPago" name="metodoPago" class="form-select" onchange="mostrarFormularioTarjeta()">
+                        <option value="">Seleccione método de pago</option>
+                        <option value="efectivo" {% if form_data.get('metodoPago') == 'efectivo' %}selected{% endif %}>
+                            Pago en Efectivo (PagoEfectivo)
+                        </option>
+                        <option value="debito" {% if form_data.get('metodoPago') == 'debito' %}selected{% endif %}>
+                            Tarjeta de Débito (PagoDebito)
+                        </option>
+                        <option value="credito" {% if form_data.get('metodoPago') == 'credito' %}selected{% endif %}>
+                            Tarjeta de Crédito (PagoCredito)
+                        </option>
+                    </select>
+                    <span class="error-message" id="error-metodoPago"></span>
                 </div>
-                <div class="form-row">
+
+                <div id="form-efectivo" class="form-tarjeta" style="display: none;">
+                    <h3>Pago en Efectivo</h3>
                     <div class="form-group">
-                        <label for="vencimiento" class="form-label">Fecha de Vencimiento (MM/AA) *</label>
-                        <input type="text" id="vencimiento" class="form-input" pattern="(0[1-9]|1[0-2])/[0-9]{2}" placeholder="MM/AA" maxlength="5">
+                        <label for="monto_recibido" class="form-label">Monto recibido *</label>
+                        <input type="number" id="monto_recibido" name="monto_recibido" class="form-input"
+                               min="0" step="0.01" value="{{ form_data.get('monto_recibido', '') }}"
+                               placeholder="Cuánto entrega el cliente">
+                        <span class="error-message" id="error-monto_recibido"></span>
+                    </div>
+                </div>
+
+                <div id="form-tarjeta" class="form-tarjeta" style="display: none;">
+                    <h3>Datos de Tarjeta</h3>
+                    <div class="form-group">
+                        <label for="numeroTarjeta" class="form-label">Número de Tarjeta *</label>
+                        <input type="text" id="numeroTarjeta" name="numeroTarjeta" class="form-input"
+                               inputmode="numeric" maxlength="16" placeholder="16 dígitos"
+                               value="{{ form_data.get('numeroTarjeta', '') }}">
+                        <span class="error-message" id="error-numeroTarjeta"></span>
                     </div>
                     <div class="form-group">
-                        <label for="cvv" class="form-label">CVV *</label>
-                        <input type="text" id="cvv" class="form-input" pattern="[0-9]{3}" placeholder="123" maxlength="3">
+                        <label for="titular" class="form-label">Nombre del Titular *</label>
+                        <input type="text" id="titular" name="titular" class="form-input"
+                               placeholder="Como figura en la tarjeta"
+                               value="{{ form_data.get('titular', '') }}">
+                        <span class="error-message" id="error-titular"></span>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="vencimiento" class="form-label">Vencimiento (MM/AA) *</label>
+                            <input type="text" id="vencimiento" name="vencimiento" class="form-input"
+                                   maxlength="5" placeholder="MM/AA"
+                                   value="{{ form_data.get('vencimiento', '') }}">
+                            <span class="error-message" id="error-vencimiento"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="cvv" class="form-label">CVV *</label>
+                            <input type="text" id="cvv" name="cvv" class="form-input"
+                                   inputmode="numeric" maxlength="3" placeholder="123"
+                                   value="{{ form_data.get('cvv', '') }}">
+                            <span class="error-message" id="error-cvv"></span>
+                        </div>
+                    </div>
+                    <div class="form-group" id="form-cuotas" style="display: none;">
+                        <label for="cuotas" class="form-label">Cuotas *</label>
+                        <input type="number" id="cuotas" name="cuotas" class="form-input"
+                               min="1" step="1" value="{{ form_data.get('cuotas', 1) }}">
+                        <span class="error-message" id="error-cuotas"></span>
                     </div>
                 </div>
-            </div>
-            
-            <button class="btn btn-primary btn-full" onclick="confirmarCompra()">Confirmar Compra</button>
+
+                <button type="submit" class="btn btn-primary btn-full">Confirmar Compra</button>
+            </form>
         </section>
     </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
-<script src="{{ url_for('static', filename='js/pago-ui.js') }}"></script>
-<script>
-function confirmarCompra() {
-    alert('Compra confirmada (simulado). Diseño UI únicamente.');
-    window.location.href = '{{ url_for("cliente_dashboard") }}';
-}
-</script>
+<script>mostrarFormularioTarjeta();</script>
 {% endblock %}

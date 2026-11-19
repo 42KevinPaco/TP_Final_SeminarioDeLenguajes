@@ -1,0 +1,84 @@
+{% extends "components/base/layout.html" %}
+
+{% block title %}Usuario - Supermercado E-commerce{% endblock %}
+
+{% block content %}
+{% set es_cliente = (usuario.rol == 'cliente') if usuario else (form_data.get('tipo', 'cliente') == 'cliente') %}
+<div class="container">
+    <h1 class="page-title">{% if usuario %}Modificar Usuario{% else %}Agregar Usuario{% endif %}</h1>
+
+    <form method="post" class="admin-form" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% if not usuario %}
+            <div class="form-group">
+                <label for="tipo" class="form-label">Tipo *</label>
+                <select id="tipo" name="tipo" class="form-select" onchange="alternarCamposCliente()">
+                    <option value="cliente" {% if form_data.get('tipo', 'cliente') == 'cliente' %}selected{% endif %}>Cliente</option>
+                    <option value="administrador" {% if form_data.get('tipo') == 'administrador' %}selected{% endif %}>Administrador</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="nombre_usuario" class="form-label">Nombre de usuario *</label>
+                <input type="text" id="nombre_usuario" name="nombre_usuario" class="form-input"
+                       value="{{ form_data.get('nombre_usuario', '') }}">
+            </div>
+        {% else %}
+            <p class="admin-nota">Usuario: <strong>{{ usuario.nombre_usuario }}</strong> ({{ usuario.rol|capitalize }}). El nombre de usuario y el tipo no se pueden cambiar.</p>
+        {% endif %}
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="nombre" class="form-label">Nombre *</label>
+                <input type="text" id="nombre" name="nombre" class="form-input"
+                       value="{{ form_data.get('nombre') or (usuario.nombre if usuario else '') }}">
+            </div>
+            <div class="form-group">
+                <label for="apellido" class="form-label">Apellido *</label>
+                <input type="text" id="apellido" name="apellido" class="form-input"
+                       value="{{ form_data.get('apellido') or (usuario.apellido if usuario else '') }}">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="email" class="form-label">Email *</label>
+            <input type="email" id="email" name="email" class="form-input"
+                   value="{{ form_data.get('email') or (usuario.email if usuario else '') }}">
+        </div>
+
+        <div id="campos-cliente"{% if not es_cliente %} style="display: none;"{% endif %}>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="domicilio" class="form-label">Domicilio *</label>
+                    <input type="text" id="domicilio" name="domicilio" class="form-input"
+                           value="{{ form_data.get('domicilio') or (usuario.domicilio if usuario and usuario.rol == 'cliente' else '') }}">
+                </div>
+                <div class="form-group">
+                    <label for="telefono" class="form-label">Teléfono (10 dígitos) *</label>
+                    <input type="text" id="telefono" name="telefono" class="form-input" maxlength="10"
+                           value="{{ form_data.get('telefono') or (usuario.telefono if usuario and usuario.rol == 'cliente' else '') }}">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="contrasena" class="form-label">
+                Contraseña {% if usuario %}(dejala vacía para no cambiarla){% else %}*{% endif %}
+            </label>
+            <input type="password" id="contrasena" name="contrasena" class="form-input" autocomplete="new-password">
+        </div>
+
+        <button type="submit" class="btn btn-primary">{% if usuario %}Guardar cambios{% else %}Crear usuario{% endif %}</button>
+        <a href="{{ url_for('admin_usuarios') }}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function alternarCamposCliente() {
+    const tipo = document.getElementById('tipo');
+    const bloque = document.getElementById('campos-cliente');
+    if (tipo && bloque) bloque.style.display = tipo.value === 'cliente' ? 'block' : 'none';
+}
+</script>
+{% endblock %}

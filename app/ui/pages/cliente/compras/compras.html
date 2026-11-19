@@ -1,0 +1,40 @@
+{% extends "components/base/layout.html" %}
+
+{% block title %}Mis Compras - Supermercado E-commerce{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="page-title">Mis Compras</h1>
+
+    {% for compra in compras %}
+        {% set sucursal = sucursales.get(compra.id_sucursal) %}
+        <section class="admin-section">
+            <h2>Compra #{{ compra.id_compra }} — {{ compra.fecha.strftime('%d/%m/%Y') }}</h2>
+            <p>
+                <strong>Sucursal:</strong> {{ sucursal.nombre if sucursal else 'Sucursal eliminada' }} |
+                <strong>Pago:</strong> {{ compra.metodo_pago|capitalize if compra.metodo_pago else '-' }} |
+                <strong>Estado:</strong> {{ compra.estado|capitalize }}
+            </p>
+            <table class="table">
+                <thead>
+                    <tr><th>Producto</th><th>Cantidad</th><th>Precio Unitario</th><th>Subtotal</th></tr>
+                </thead>
+                <tbody>
+                    {% for detalle in compra.detalles %}
+                        <tr>
+                            <td>{{ detalle.nombre_producto }}</td>
+                            <td>{{ detalle.cantidad }}</td>
+                            <td>$ {{ "%.2f"|format(detalle.precio_unitario) }}</td>
+                            <td>$ {{ "%.2f"|format(detalle.subtotal) }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="compra-total"><strong>Total: $ {{ "%.2f"|format(compra.total) }}</strong></div>
+        </section>
+    {% else %}
+        <p class="tabla-vacia">Todavía no realizaste ninguna compra.</p>
+        <a href="{{ url_for('catalogo') }}" class="btn btn-primary">Ir al catálogo</a>
+    {% endfor %}
+</div>
+{% endblock %}

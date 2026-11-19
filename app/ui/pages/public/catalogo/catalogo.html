@@ -2,27 +2,41 @@
 
 {% block title %}Catálogo - Supermercado E-commerce{% endblock %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/catalogo.css') }}">
-{% endblock %}
-
 {% block content %}
 <div class="catalogo-container">
-    <h1 class="page-title">Catálogo de Productos</h1>
-    
+    {% set destino_carrito = url_for('cliente_carrito') if session.get('rol') == 'cliente' else url_for('login', next=url_for('cliente_carrito')) %}
+    <div class="catalogo-encabezado">
+        <h1 class="page-title">Catálogo de Productos</h1>
+        <a href="{{ destino_carrito }}" class="carrito-flotante" aria-label="Ver carrito">
+            <span class="carrito-flotante-icono" aria-hidden="true">&#128722;</span>
+            <span class="carrito-contador js-carrito-contador" data-cantidad="{{ cantidad_carrito }}">{{ cantidad_carrito }}</span>
+        </a>
+    </div>
+
     {% include 'components/banner-propaganda/banner-propaganda.html' %}
-    
+
+    <form method="get" action="{{ url_for('catalogo') }}" class="catalogo-buscador" role="search">
+        <label for="busqueda" class="form-label">Consultar un producto</label>
+        <input type="search" id="busqueda" name="q" class="form-input" value="{{ busqueda }}"
+               placeholder="Nombre, marca o descripción">
+        <button type="submit" class="btn btn-primary">Buscar</button>
+        {% if busqueda %}<a href="{{ url_for('catalogo') }}" class="btn btn-secondary">Ver todos</a>{% endif %}
+    </form>
+
     <section class="productos-section">
-        <h2 class="section-title">Productos Disponibles</h2>
+        <h2 class="section-title">
+            {% if busqueda %}Resultados para "{{ busqueda }}"{% else %}Productos{% endif %}
+        </h2>
         <div class="productos-grid">
-            {% for producto in productos %}
+            {% for item in items %}
+                {% set producto = item.producto %}
                 {% include 'components/product-card/product-card.html' %}
+            {% else %}
+                <p class="catalogo-vacio">
+                    {% if busqueda %}No existe ningún producto que coincida con "{{ busqueda }}".{% else %}No hay productos cargados por el momento.{% endif %}
+                </p>
             {% endfor %}
         </div>
     </section>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script src="{{ url_for('static', filename='js/carrito-ui.js') }}"></script>
 {% endblock %}

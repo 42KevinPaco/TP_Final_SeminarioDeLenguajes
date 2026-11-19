@@ -9,13 +9,13 @@
 {% block content %}
 <div class="container">
     <h1 class="page-title">Administración de Sucursales y Stock</h1>
-    
+
     <section class="admin-section">
         <div class="admin-header">
             <h2>Sucursales</h2>
-            <button class="btn btn-primary">Agregar Sucursal</button>
+            <a href="{{ url_for('admin_sucursal_nueva') }}" class="btn btn-primary">Agregar Sucursal</a>
         </div>
-        
+
         <table class="admin-table">
             <thead>
                 <tr>
@@ -28,27 +28,39 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>Sucursal Centro</td>
-                    <td>Av. Principal 123</td>
-                    <td>-34.6037</td>
-                    <td>-58.3816</td>
-                    <td>
-                        <button class="btn btn-small btn-secondary">Modificar</button>
-                        <button class="btn btn-small btn-danger">Eliminar</button>
-                    </td>
-                </tr>
+                {% for sucursal in sucursales %}
+                    <tr>
+                        <td>{{ sucursal.id_sucursal }}</td>
+                        <td>{{ sucursal.nombre }}</td>
+                        <td>{{ sucursal.direccion }}</td>
+                        <td>{{ "%.4f"|format(sucursal.latitud) }}</td>
+                        <td>{{ "%.4f"|format(sucursal.longitud) }}</td>
+                        <td>
+                            <a href="{{ url_for('admin_sucursal_modificar', id_sucursal=sucursal.id_sucursal) }}"
+                               class="btn btn-small btn-secondary">Modificar</a>
+                            <form method="post" class="inline-form"
+                                  action="{{ url_for('admin_sucursal_eliminar', id_sucursal=sucursal.id_sucursal) }}"
+                                  onsubmit="return confirm('¿Eliminar la sucursal {{ sucursal.nombre }}? También se borra su stock.');">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-small btn-danger">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="tabla-vacia">No hay sucursales cargadas.</td>
+                    </tr>
+                {% endfor %}
             </tbody>
         </table>
     </section>
-    
+
     <section class="admin-section">
         <div class="admin-header">
             <h2>Stock por Sucursal (StockSucursal)</h2>
-            <button class="btn btn-primary">Asignar Stock</button>
+            <a href="{{ url_for('admin_stock_asignar') }}" class="btn btn-primary">Asignar Stock</a>
         </div>
-        
+
         <table class="admin-table">
             <thead>
                 <tr>
@@ -60,15 +72,27 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>Leche Entera</td>
-                    <td>Sucursal Centro</td>
-                    <td>50</td>
-                    <td>
-                        <button class="btn btn-small btn-secondary">Actualizar Stock</button>
-                    </td>
-                </tr>
+                {% for fila in filas_stock %}
+                    <tr>
+                        <td>{{ fila.stock.id_stock }}</td>
+                        <td>{{ fila.producto.nombre if fila.producto else 'Producto eliminado' }}</td>
+                        <td>{{ fila.sucursal.nombre if fila.sucursal else 'Sucursal eliminada' }}</td>
+                        <td>{{ fila.stock.cantidad_disponible }}</td>
+                        <td>
+                            <form method="post" class="inline-form inline-form-stock"
+                                  action="{{ url_for('admin_stock_actualizar', id_stock=fila.stock.id_stock) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="number" name="cantidad" class="input-cantidad"
+                                       min="0" step="1" value="{{ fila.stock.cantidad_disponible }}">
+                                <button type="submit" class="btn btn-small btn-secondary">Actualizar Stock</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="tabla-vacia">No hay stock registrado.</td>
+                    </tr>
+                {% endfor %}
             </tbody>
         </table>
     </section>
